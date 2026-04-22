@@ -83,3 +83,4 @@ BSD-3-Clause
 
 ---
 *Created for the MetaxBangalore Hackathon 2026.*
+***Archit Mittal and Purvansh Joshi***
