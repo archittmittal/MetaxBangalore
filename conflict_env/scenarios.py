@@ -19,7 +19,7 @@ from __future__ import annotations
 import random
 from typing import Any, Dict, List, Optional, Tuple
 
-from actors import Actor, get_actors_for_difficulty
+from .actors import Actor, get_actors_for_difficulty
 
 
 # ---------------------------------------------------------------------------

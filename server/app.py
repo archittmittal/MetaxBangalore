@@ -23,8 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import openenv.core.env_server.types as openenv_types
 import openenv.core.env_server.http_server as openenv_http
 from openenv.core.env_server.http_server import create_app
-from env import ConflictEnv
-from models import ConflictAction, ConflictObservation, ConflictState
+from conflict_env import ConflictEnv, ConflictAction, ConflictObservation, ConflictState
 import uvicorn
 
 openenv_types.State = ConflictState

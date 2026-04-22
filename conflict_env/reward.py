@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from actors import Actor
+from .actors import Actor
 
 
 # ---------------------------------------------------------------------------

@@ -16,9 +16,9 @@ import argparse
 import json
 import sys
 
-from env import ConflictEnv
-from models import ConflictAction
-from reward import compute_crr, compute_ssi
+from .env import ConflictEnv
+from .models import ConflictAction
+from .reward import compute_crr, compute_ssi
 
 
 def separator(title: str, char: str = "=") -> None:

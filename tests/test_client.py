@@ -24,8 +24,10 @@ if hasattr(sys.stdout, "reconfigure"):
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-from env import ConflictEnv
-from models import ConflictAction
+# Ensure parent directory is on the path so we can import conflict_env
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from conflict_env import ConflictEnv, ConflictAction
 
 
 def separator(title: str) -> None:

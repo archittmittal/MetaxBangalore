@@ -16,16 +16,16 @@ from typing import Any, Dict, List, Optional
 
 from openenv.core.env_server.interfaces import Environment
 
-from models import ConflictAction, ConflictObservation, ConflictState, VALID_COMMANDS
-from actors import (
+from .models import ConflictAction, ConflictObservation, ConflictState, VALID_COMMANDS
+from .actors import (
     Actor,
     apply_satisfaction_delta,
     compute_satisfaction_delta,
     generate_counter_proposal,
 )
-from drift import apply_drift, get_drift_version
-from scenarios import generate_scenario, Scenario, ARCHETYPES, ALL_SLOTS
-from reward import (
+from .drift import apply_drift, get_drift_version
+from .scenarios import generate_scenario, Scenario, ARCHETYPES, ALL_SLOTS
+from .reward import (
     compute_reward,
     compute_step_reward,
     clamp,
