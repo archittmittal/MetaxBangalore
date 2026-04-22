@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "conflict-env"
+version = "1.0.0"
+description = "OpenEnv RL environment for training LLMs to resolve cascading personal scheduling conflicts with dynamic schema drift"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "openenv-core",
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
+]
+
+[project.scripts]
+server = "server.app:main"
