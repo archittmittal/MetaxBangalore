@@ -1,4 +1,4 @@
-# 🗓️ ConflictEnv: Dynamic Scheduling Conflict Benchmark
+# ConflictEnv: Dynamic Scheduling Conflict Benchmark
 
 > **"Resolving cascading personal scheduling conflicts under massive schema drift."**
 
@@ -6,7 +6,7 @@ ConflictEnv is a high-fidelity Reinforcement Learning (RL) environment designed 
 
 ---
 
-## 🚀 Mission Overview
+## Mission Overview
 
 In a world of constant schedule changes, traditional AI assistants fail when APIs change or conflicts cascade. ConflictEnv benchmarks an agent's ability to:
 1.  **Negotiate**: Resolve overlaps across 8 distinct actor archetypes (Boss, Spouse, Client, etc.).
@@ -15,7 +15,7 @@ In a world of constant schedule changes, traditional AI assistants fail when API
 
 ---
 
-## 🛠️ Core Architecture
+## Core Architecture
 
 - **`env.py`**: The heart of the benchmark—an OpenEnv-compliant environment subclass.
 - **`scenarios.py`**: 5 archetypes (Morning Crunch, Travel Chaos, etc.) with deterministic seed support.
@@ -25,7 +25,7 @@ In a world of constant schedule changes, traditional AI assistants fail when API
 
 ---
 
-## 📡 Protocol Compliance
+## Protocol Compliance
 
 ConflictEnv implements the **OpenEnv HTTP API Protocol**. We've optimized the server implementation to ensure robust performance across stateless and stateful requests:
 
@@ -40,7 +40,7 @@ ConflictEnv implements the **OpenEnv HTTP API Protocol**. We've optimized the se
 
 ---
 
-## 🏗️ Getting Started
+## Getting Started
 
 ### 1. Installation
 Ensure you have Python 3.8+ and install the dependencies:
@@ -62,14 +62,14 @@ python test_api.py
 
 ---
 
-## 🏆 Patronus AI Bonus Prize Features
+## Patronus AI Bonus Prize Features
 
 - **Theme 1 (Multi-Agent)**: Agents must negotiate with multiple actors, each with varying "satisfaction" levels that impact the final reward.
 - **Theme 3 (Schema Drift)**: Observations evolve from V1 (baseline) to V3 (deeply nested/renamed) over the course of training epochs, testing the agent's structural robustness.
 
 ---
 
-## 📜 License
+## License
 BSD-3-Clause
 
 ---
