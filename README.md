@@ -1,3 +1,12 @@
+---
+title: Conflict Env
+emoji: 📈
+colorFrom: green
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # ConflictEnv: Dynamic Scheduling Conflict Benchmark
 
 > **"Resolving cascading personal scheduling conflicts under massive schema drift."**
@@ -17,7 +26,7 @@ In a world of constant schedule changes, traditional AI assistants fail when API
 
 ## Core Architecture
 
-- **`env.py`**: The heart of the benchmark—an OpenEnv-compliant environment subclass.
+- **`conflict_env/`**: The heart of the benchmark—an OpenEnv-compliant package.
 - **`scenarios.py`**: 5 archetypes (Morning Crunch, Travel Chaos, etc.) with deterministic seed support.
 - **`actors.py`**: Multi-agent system where actors have unique "Flexibility" and "Tone Sensitivity."
 - **`drift.py`**: The Schema Drift Engine that mutates observations in real-time.
@@ -57,7 +66,7 @@ python server/app.py
 ### 3. Verify Protocol Compliance
 Run the automated verification suite to ensure all endpoints are aligned with the OpenEnv specification:
 ```bash
-python test_api.py
+python tests/test_api.py
 ```
 
 ---
