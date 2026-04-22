@@ -43,6 +43,25 @@ app = create_app(
 )
 
 
+@app.get("/")
+def read_root():
+    """Welcome page for the ConflictEnv OpenEnv server."""
+    return {
+        "status": "online",
+        "name": "ConflictEnv Mission Control",
+        "version": "1.0.0",
+        "protocol": "OpenEnv v1.0",
+        "description": "High-fidelity scheduling conflict environment with dynamic schema drift.",
+        "endpoints": {
+            "reset": "/reset",
+            "step": "/step",
+            "state": "/state",
+            "health": "/health"
+        },
+        "docs": "https://github.com/archittmittal/MetaxBangalore"
+    }
+
+
 def main():
     """Entry point for running the server directly."""
     uvicorn.run(app, host="0.0.0.0", port=7860)
