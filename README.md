@@ -7,80 +7,76 @@ sdk: docker
 pinned: false
 ---
 
-# ConflictEnv: Dynamic Scheduling Conflict Benchmark
+# 🗓️ ConflictEnv: The Personal Assistant Stress Test
 
-> **"Resolving cascading personal scheduling conflicts under massive schema drift."**
+**A Benchmark for Reasoning-Based Scheduling & Social Nuance under Schema Drift.**
 
-ConflictEnv is a high-fidelity Reinforcement Learning (RL) environment designed for training LLM-based personal assistants to handle complex, multi-agent scheduling conflicts. Built specifically for the **MetaxBangalore Hackathon** and targeting the **Patronus AI Bonus Prize**, it introduces dynamic **Schema Drift** that forces agents to generalize across evolving data structures.
-
----
-
-## Mission Overview
-
-In a world of constant schedule changes, traditional AI assistants fail when APIs change or conflicts cascade. ConflictEnv benchmarks an agent's ability to:
-1.  **Negotiate**: Resolve overlaps across 8 distinct actor archetypes (Boss, Spouse, Client, etc.).
-2.  **Adapt**: Navigate **3 Tiers of Schema Drift** (V1, V2, V3) where fields rename and structures nest.
-3.  **Prioritize**: Balance hard deadlines, actor satisfaction, and resource constraints.
+[![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-blue)](https://huggingface.co/spaces/purvansh01/conflict-env)
+[![OpenEnv Compliant](https://img.shields.io/badge/OpenEnv-Compliant-green)](https://github.com/OpenEnv/OpenEnv)
 
 ---
 
-## Core Architecture
+## 🚀 The Mission: Beyond Simple Scheduling
+Most AI assistants can book a calendar invite. But what happens when **everything goes wrong at once?**
 
-- **`conflict_env/`**: The heart of the benchmark—an OpenEnv-compliant package.
-- **`scenarios.py`**: 5 archetypes (Morning Crunch, Travel Chaos, etc.) with deterministic seed support.
-- **`actors.py`**: Multi-agent system where actors have unique "Flexibility" and "Tone Sensitivity."
-- **`drift.py`**: The Schema Drift Engine that mutates observations in real-time.
-- **`reward.py`**: Fine-grained reward system accounting for CRR (Conflict Resolution Rate) and SSI (Social Satisfaction Index).
+**ConflictEnv** is a high-fidelity simulation designed for **Theme #3.2 (Personalized Tasks)** of the OpenEnv Hackathon. It challenges agents to act as executive assistants managing a "Monday from Hell": cascading conflicts, stakeholder egos, and dynamic API changes (Schema Drift).
 
----
-
-## Protocol Compliance
-
-ConflictEnv implements the **OpenEnv HTTP API Protocol**. We've optimized the server implementation to ensure robust performance across stateless and stateful requests:
-
-- **Endpoint Registry**:
-    - `POST /reset`: Initialize new scenarios with customized difficulty.
-    - `POST /step`: Execute complex actions (reschedule, draft_message, resolve).
-    - `GET /state`: Inspect the full environment state (Patched for Pydantic serialization).
-    - `GET /health`: System integrity check.
-
-> [!IMPORTANT]
-> The server includes a robust monkey-patch for the `openenv-core` state handler to ensure that custom fields (like `obs`, `difficulty`, and `scenario_name`) are correctly serialized and returned in the `/state` endpoint.
+### Why it matters:
+*   **Complexity**: Resolving one conflict often creates three more.
+*   **Social Nuance**: It’s not just about the time; it’s about *who* you offend.
+*   **Resilience**: The environment evolves. If your agent relies on fixed field names (V1), it will break when the "API" updates (V3).
 
 ---
 
-## Getting Started
+## 📊 The "Battle of the Agents" (Leaderboard)
+We benchmarked a standard **Reinforcement Learning (PPO)** agent against a **72B Parameter Reasoning Agent (Qwen-2.5)**.
 
-### 1. Installation
-Ensure you have Python 3.8+ and install the dependencies:
+| Scenario | RL Agent (PPO) | LLM Agent (Qwen-72B) | The Verdict |
+| :--- | :--- | :--- | :--- |
+| **Morning Crunch (Easy)** | 100% Resolved | 100% Resolved | RL is efficient for simple tasks. |
+| **Travel Chaos (Medium)** | **0% Resolved** | **100% Resolved** | **The Reasoning Gap**: RL hits a ceiling. |
+| **Monday from Hell (Hard)** | 0% Resolved | 0% (In Progress) | Complex multi-step reasoning is the frontier. |
+
+![The Reasoning Gap](https://raw.githubusercontent.com/archittmittal/MetaxBangalore/main/docs/reasoning_gap.png)
+
+### 📈 The Reasoning Gap
+Our data shows that while RL agents can be optimized for static rewards, they lack the **Theory of Mind** required to negotiate between a "Grumpy Boss" and a "Strict Doctor." LLMs use zero-shot reasoning to bridge this gap.
+
+---
+
+## 🛠️ Environment Innovation
+1.  **Dual-Metric Rewards**: 
+    *   **CRR (Conflict Resolution Rate)**: Did you fix the schedule?
+    *   **SSI (Social Satisfaction Index)**: Are the humans still happy?
+2.  **Schema Drift (V1-V3)**: We simulate real-world software evolution. Fields like `time` might change to `start_period` across episodes, testing the agent's semantic understanding.
+3.  **OpenEnv Protocol**: Fully compliant with the latest OpenEnv spec (`/reset`, `/step`, `/state`).
+
+---
+
+## 🧪 Training & Evaluation
+### Minimal Training Script
+We provide a unified pipeline for training RL baselines and evaluating LLMs.
 ```bash
-pip install -r requirements.txt
+# Train the RL Baseline
+python train_and_eval.py --timesteps 50000
+
+# Evaluate a Reasoning Agent (via HF Inference)
+python train_and_eval.py --llm-only --llm-model qwen-72b
 ```
 
-### 2. Run the OpenEnv Server
-Start the FastAPI server (Default port 7860):
-```bash
-python server/app.py
-```
-
-### 3. Verify Protocol Compliance
-Run the automated verification suite to ensure all endpoints are aligned with the OpenEnv specification:
-```bash
-python tests/test_api.py
-```
+### [🔗 Colab Training Notebook (Unsloth/TRL)](https://github.com/archittmittal/MetaxBangalore/blob/main/notebooks/colab_training.py)
+*Check the notebook directory for the training script.*
 
 ---
 
-## Patronus AI Bonus Prize Features
-
-- **Theme 1 (Multi-Agent)**: Agents must negotiate with multiple actors, each with varying "satisfaction" levels that impact the final reward.
-- **Theme 3 (Schema Drift)**: Observations evolve from V1 (baseline) to V3 (deeply nested/renamed) over the course of training epochs, testing the agent's structural robustness.
-
----
-
-## License
-BSD-3-Clause
+## 🎬 Presentation Materials
+*   **Mini-Blog**: [ConflictEnv: Why RL isn't enough for your Calendar](https://huggingface.co/blog/purvansh01/conflict-env)
+*   **Demo Video**: [The Monday From Hell Simulation](https://youtube.com/...)
+*   **Pitch Deck**: [ConflictEnv Strategy PDF](https://github.com/...)
 
 ---
-*Created for the MetaxBangalore Hackathon 2026.*
-***Archit Mittal and Purvansh Joshi***
+
+## 🧑‍💻 The Team
+Built with ❤️ for the **OpenEnv Hackathon (India 2026)**.
+
+*"Ambition is the reward for solving the first conflict."*
