@@ -21,8 +21,9 @@ from conflict_env.models import ConflictAction
 PatchFastRL("GRPO", "Unsloth")
 
 # 1. Load Model & Tokenizer
+model_id = "Qwen/Qwen2.5-1.5B-Instruct" # Perfect for Billion-parameter reasoning training
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = "Qwen/Qwen2.5-7B-Instruct",
+    model_name = model_id,
     max_seq_length = 2048,
     load_in_4bit = True,
     fast_inference = True,
@@ -37,7 +38,14 @@ model = FastLanguageModel.get_peft_model(
     lora_dropout = 0,
 )
 
-# 2. Define Reward Functions (Verifiable & Independent)
+# 2. Load Dataset
+import json
+from datasets import Dataset
+with open("training_prompts.json") as f:
+    data = json.load(f)
+train_dataset = Dataset.from_list(data)
+
+# 3. Define Reward Functions (Verifiable & Independent)
 def reward_conflict_resolution(prompts, completions, **kwargs):
     """Checks if the model actually fixed the calendar."""
     rewards = []
@@ -47,17 +55,15 @@ def reward_conflict_resolution(prompts, completions, **kwargs):
         env.reset(task_name="auto")
         
         # Parse completion for reasoning and action
-        # Expected format: <thought>...</thought>{"command": "...", ...}
         try:
-            # Simple parsing for the demo
             if "<thought>" in completion and "{" in completion:
-                # Execute action in environment
-                # (Actual implementation would loop through steps if multi-turn)
-                env.step(ConflictAction.model_validate_json(completion.split("}")[0].split("{")[1] + "}"))
+                # Extract JSON action
+                action_str = completion.split("}")[0].split("{")[1] + "}"
+                env.step(ConflictAction.model_validate_json(action_str))
                 reward_data = env.get_reward()
-                rewards.append(reward_data) # This includes CRR + SSI
+                rewards.append(reward_data)
             else:
-                rewards.append(0.05) # Minimum reward for bad format
+                rewards.append(0.05)
         except:
             rewards.append(0.05)
     return rewards
@@ -72,31 +78,34 @@ def reward_format_check(prompts, completions, **kwargs):
             rewards.append(0.0)
     return rewards
 
-# 3. Training Config
+# 4. Training Config
 training_args = GRPOConfig(
-    output_dir = "conflict_env_grpo",
+    output_dir = "conflict-env-qwen-1.5b-grpo",
     learning_rate = 5e-6,
     per_device_train_batch_size = 1,
     gradient_accumulation_steps = 4,
-    num_generations = 8,  # Group size for GRPO
+    num_generations = 4, 
     max_prompt_length = 512,
     max_completion_length = 512,
     num_train_epochs = 1,
     logging_steps = 10,
     report_to = "tensorboard",
+    push_to_hub = True,
+    hub_model_id = "purvansh01/conflict-env-qwen-1.5b-grpo",
 )
 
-# 4. Initialize Trainer
+# 5. Initialize Trainer
 trainer = GRPOTrainer(
     model = model,
     reward_funcs = [reward_conflict_resolution, reward_format_check],
     args = training_args,
-    train_dataset = None, # (Add your scenario dataset here)
+    train_dataset = train_dataset,
     tokenizer = tokenizer,
 )
 
-# 5. Execute Training
+# 6. Execute Training
 if __name__ == "__main__":
-    print("[ConflictEnv] Starting Elite-Tier GRPO Training...")
+    print(f"[ConflictEnv] Starting GRPO Training for {model_id}...")
     # trainer.train()
-    print("[ConflictEnv] Training loop ready for Bangalore onsite compute.")
+    # trainer.push_to_hub()
+    print("[ConflictEnv] Training pipeline initialized with 150 prompts. Ready for Colab/A100.")
