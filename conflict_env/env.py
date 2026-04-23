@@ -56,14 +56,18 @@ class ConflictEnv(Environment):
         self._max_steps: int = 15
         self._done: bool = False
         self._escalated: bool = False
+        self._action_history: List[str] = []  # For loop detection
+        self._has_loop: bool = False
 
         # --- Reward accumulation ---
         self._cumulative_reward: float = 0.10  # Safe initial value
         self._last_step_reward: float = 0.0
 
-        # --- Drift tracking (persists across episodes) ---
+        # --- Performance tracking (persists across episodes) ---
         self._episode_count: int = 0
         self._drift_version: str = "v1"
+        self._crr_history: List[float] = []  # Rolling history for adaptive difficulty
+        self._rolling_crr: float = 0.0
 
         # --- RNG ---
         self._rng = random.Random(42)
@@ -85,19 +89,29 @@ class ConflictEnv(Environment):
     #  OpenEnv Protocol: reset
     # ===================================================================
 
-    def reset(self, task_name: str = "easy", **kwargs) -> ConflictObservation:
+    def reset(self, task_name: str = "auto", **kwargs) -> ConflictObservation:
         """
         Reset the environment with a new scenario.
 
         task_name can be:
-          - "easy", "medium", "hard" -- random archetype with given difficulty
-          - "morning_crunch", "travel_chaos", etc. -- specific archetype (defaults to medium)
-          - "monday_from_hell_hard" -- archetype + difficulty combined
+          - "auto" -- Uses adaptive difficulty based on rolling CRR (Theme #4)
+          - "easy", "medium", "hard" -- Fixed difficulty
+          - "morning_crunch", etc. -- specific archetype
         """
         sys.stderr.write(f"\n[ConflictEnv] Resetting -- task: {task_name}, episode: {self._episode_count}\n")
 
-        # Parse task name
-        difficulty, archetype = self._parse_task_name(task_name)
+        # --- Theme #4: Adaptive Curriculum ---
+        if task_name == "auto":
+            if self._rolling_crr < 0.3:
+                difficulty = "easy"
+            elif self._rolling_crr < 0.7:
+                difficulty = "medium"
+            else:
+                difficulty = "hard"
+            archetype = None
+            sys.stderr.write(f"[ConflictEnv] Adaptive Difficulty scaled to: {difficulty} (Rolling CRR: {self._rolling_crr:.2f})\n")
+        else:
+            difficulty, archetype = self._parse_task_name(task_name)
 
         # Update drift version based on episode count
         self._drift_version = get_drift_version(self._episode_count)
@@ -114,7 +128,7 @@ class ConflictEnv(Environment):
         # Initialize episode state from scenario
         self._events = copy.deepcopy(self._scenario.events)
         self._conflicts = copy.deepcopy(self._scenario.conflicts)
-        self._actors = self._scenario.actors  # Already fresh copies
+        self._actors = self._scenario.actors
         self._policy_rules = copy.deepcopy(self._scenario.policy_rules)
         self._hard_deadlines = list(self._scenario.hard_deadlines)
         self._hard_deadlines_met = []
@@ -125,6 +139,8 @@ class ConflictEnv(Environment):
         self._max_steps = self._scenario.max_steps
         self._done = False
         self._escalated = False
+        self._action_history = []
+        self._has_loop = False
         self._cumulative_reward = 0.10
         self._last_step_reward = 0.0
 
@@ -180,6 +196,10 @@ class ConflictEnv(Environment):
 
         # --- Compute final reward on done ---
         if self._done:
+            # Theme #3.2: Check for reasoning block in agent's output (mock check for now)
+            # In a real GRPO setup, the server/agent-wrapper would pass this in action metadata.
+            reasoning_present = hasattr(action, "thought") or "<thought>" in str(action)
+            
             final = compute_reward(
                 conflicts=self._conflicts,
                 actors=self._actors,
@@ -188,11 +208,20 @@ class ConflictEnv(Environment):
                 steps_taken=self._step_count,
                 max_steps=self._max_steps,
                 escalated=self._escalated,
+                reasoning_present=reasoning_present,
+                has_loop=self._has_loop
             )
             self._cumulative_reward = final["reward"]
+            
+            # --- Theme #4: Update Performance History ---
+            self._crr_history.append(final["crr"])
+            if len(self._crr_history) > 10:
+                self._crr_history.pop(0)
+            self._rolling_crr = sum(self._crr_history) / len(self._crr_history)
+
             sys.stderr.write(
                 f"[ConflictEnv] Episode done -- Reward: {final['reward']:.4f}, "
-                f"CRR: {final['crr']:.2f}, SSI: {final['ssi']:.2f}\n"
+                f"CRR: {final['crr']:.2f}, Rolling CRR: {self._rolling_crr:.2f}\n"
             )
 
         self._current_obs = self._build_observation()
@@ -223,6 +252,13 @@ class ConflictEnv(Environment):
         """Move an event to a new time slot. May trigger cascades and counter-proposals."""
         event_id = params.get("event_id", "")
         new_slot = params.get("new_slot", "")
+
+        # --- Theme #3.1: Loop Detection (Anti-Hacking) ---
+        action_key = f"{event_id}:{new_slot}"
+        if self._action_history.count(action_key) >= 2:
+            self._has_loop = True
+            sys.stderr.write(f"[ConflictEnv] [WARNING] Loop detected for action: {action_key}\n")
+        self._action_history.append(action_key)
 
         event = self._find_event(event_id)
         if not event:

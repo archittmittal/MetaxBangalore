@@ -2,3 +2,9 @@ openenv-core
 fastapi
 uvicorn[standard]
 pydantic
+gymnasium
+stable-baselines3
+huggingface_hub
+python-dotenv
+trl
+unsloth

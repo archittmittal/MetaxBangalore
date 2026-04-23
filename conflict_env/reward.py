@@ -46,6 +46,8 @@ def compute_reward(
     steps_taken: int,
     max_steps: int,
     escalated: bool = False,
+    reasoning_present: bool = True,
+    has_loop: bool = False,
 ) -> Dict[str, float]:
     """
     Compute the multi-signal reward.
@@ -56,7 +58,8 @@ def compute_reward(
       - "ssi": Stakeholder Satisfaction Index
       - "deadline_score": Deadline adherence ratio
       - "efficiency": Efficiency score
-      - "components": Dict of weighted components
+      - "format_reward": Process supervision signal (reasoning block)
+      - "loop_penalty": Anti-hacking signal
     """
     # --- 1. Conflict Resolution Rate (CRR) ---
     total_conflicts = len(conflicts)
@@ -78,12 +81,18 @@ def compute_reward(
     # --- 4. Efficiency ---
     efficiency = max(0.0, 1.0 - (steps_taken / max(max_steps, 1)))
 
+    # --- 5. Process & Anti-Hacking Signals ---
+    format_reward = 1.0 if reasoning_present else 0.0
+    loop_penalty = -0.2 if has_loop else 0.0
+
     # --- Weighted sum ---
     raw = (
         W_CONFLICT_RESOLUTION * crr
         + W_STAKEHOLDER_SATISFACTION * ssi
         + W_DEADLINE_ADHERENCE * deadline_score
         + W_EFFICIENCY * efficiency
+        + 0.10 * format_reward  # Bonus for thinking
+        + loop_penalty          # Penalty for oscillating
     )
 
     # --- Escalation penalty ---
@@ -99,11 +108,14 @@ def compute_reward(
         "ssi": round(ssi, 4),
         "deadline_score": round(deadline_score, 4),
         "efficiency": round(efficiency, 4),
+        "format_reward": round(format_reward, 4),
+        "loop_penalty": round(loop_penalty, 4),
         "components": {
             "conflict_resolution": round(W_CONFLICT_RESOLUTION * crr, 4),
             "stakeholder_satisfaction": round(W_STAKEHOLDER_SATISFACTION * ssi, 4),
             "deadline_adherence": round(W_DEADLINE_ADHERENCE * deadline_score, 4),
             "efficiency": round(W_EFFICIENCY * efficiency, 4),
+            "reasoning_bonus": round(0.10 * format_reward, 4)
         },
     }
 
