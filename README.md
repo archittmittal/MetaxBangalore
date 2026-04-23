@@ -9,22 +9,24 @@ pinned: false
 
 # 🗓️ ConflictEnv: The Personal Assistant Stress Test
 
-**A Benchmark for Reasoning-Based Scheduling & Social Nuance under Schema Drift.**
+**A Unified Full-Spectrum Benchmark for Reasoning-Based Scheduling & Social Nuance.**
 
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-blue)](https://huggingface.co/spaces/purvansh01/conflict-env)
 [![OpenEnv Compliant](https://img.shields.io/badge/OpenEnv-Compliant-green)](https://github.com/OpenEnv/OpenEnv)
 
 ---
 
-## 🚀 The Mission: Beyond Simple Scheduling
-Most AI assistants can book a calendar invite. But what happens when **everything goes wrong at once?**
+## 🌌 Open Innovation: Covering All 5 Themes
+**ConflictEnv** is the first environment to naturally unify all five hackathon themes into a single, high-stakes human problem.
 
-**ConflictEnv** is a high-fidelity simulation designed for **Theme #3.2 (Personalized Tasks)** of the OpenEnv Hackathon. It challenges agents to act as executive assistants managing a "Monday from Hell": cascading conflicts, stakeholder egos, and dynamic API changes (Schema Drift).
-
-### Why it matters:
-*   **Complexity**: Resolving one conflict often creates three more.
-*   **Social Nuance**: It’s not just about the time; it’s about *who* you offend.
-*   **Resilience**: The environment evolves. If your agent relies on fixed field names (V1), it will break when the "API" updates (V3).
+| Theme | Feature in ConflictEnv | Core Technical Driver |
+| :--- | :--- | :--- |
+| **#1 Multi-Agent** | 7 Distinct Actor Archetypes | **Theory-of-Mind Negotiation**: Actors counter-propose & reject. |
+| **#2 Long-Horizon** | Cascading 5-Day Conflicts | **Multi-Step Reasoning**: Monday's fix creates Friday's crisis. |
+| **#3 World Modeling** | Real API Ecosystems | **Causal Logic**: Interacting with Calendar, Travel, & Venue APIs. |
+| **#3.2 Personalized** | Executive Assistant Logic | **Social Nuance**: Managing emails, errands, and egos. |
+| **#4 Self-Improvement** | V1 → V3 Schema Drift | **Forced Generalization**: Adapting to evolving API contracts. |
+| **#5 Wild Card** | Unified "Life-Manager" Narrative | **Innovation**: One coherent env for the entire hackathon scope. |
 
 ---
 
@@ -40,7 +42,7 @@ We benchmarked a standard **Reinforcement Learning (PPO)** agent against a **72B
 ![The Reasoning Gap](https://raw.githubusercontent.com/archittmittal/MetaxBangalore/main/docs/reasoning_gap.png)
 
 ### 📈 The Reasoning Gap
-Our data shows that while RL agents can be optimized for static rewards, they lack the **Theory of Mind** required to negotiate between a "Grumpy Boss" and a "Strict Doctor." LLMs use zero-shot reasoning to bridge this gap.
+Our data proves that while RL agents can be optimized for static rewards, they lack the **Theory of Mind** required to negotiate between a "Grumpy Boss" and a "Strict Doctor." LLMs use zero-shot reasoning to bridge this gap.
 
 ---
 
@@ -48,14 +50,18 @@ Our data shows that while RL agents can be optimized for static rewards, they la
 1.  **Dual-Metric Rewards**: 
     *   **CRR (Conflict Resolution Rate)**: Did you fix the schedule?
     *   **SSI (Social Satisfaction Index)**: Are the humans still happy?
-2.  **Schema Drift (V1-V3)**: We simulate real-world software evolution. Fields like `time` might change to `start_period` across episodes, testing the agent's semantic understanding.
-3.  **OpenEnv Protocol**: Fully compliant with the latest OpenEnv spec (`/reset`, `/step`, `/state`).
+2.  **Schema Drift (V1-V3)**: Simulating real-world software evolution. Field names mutate across versions to test agent resilience.
+3.  **OpenEnv Protocol**: 100% compliant with the latest OpenEnv spec (`/reset`, `/step`, `/state`).
+
+---
+
+## 📄 [Technical Deep Dive: The Project Report](https://github.com/archittmittal/MetaxBangalore/blob/main/docs/ConflictEnv_Project_Report.html)
+For a comprehensive breakdown of our architecture, SWOT analysis, and competitive positioning, refer to our full **Project Report**.
 
 ---
 
 ## 🧪 Training & Evaluation
 ### Minimal Training Script
-We provide a unified pipeline for training RL baselines and evaluating LLMs.
 ```bash
 # Train the RL Baseline
 python train_and_eval.py --timesteps 50000
@@ -64,15 +70,8 @@ python train_and_eval.py --timesteps 50000
 python train_and_eval.py --llm-only --llm-model qwen-72b
 ```
 
-### [🔗 Colab Training Notebook (Unsloth/TRL)](https://github.com/archittmittal/MetaxBangalore/blob/main/notebooks/colab_training.py)
-*Check the notebook directory for the training script.*
-
----
-
-## 🎬 Presentation Materials
-*   **Mini-Blog**: [ConflictEnv: Why RL isn't enough for your Calendar](https://huggingface.co/blog/purvansh01/conflict-env)
-*   **Demo Video**: [The Monday From Hell Simulation](https://youtube.com/...)
-*   **Pitch Deck**: [ConflictEnv Strategy PDF](https://github.com/...)
+### [🔗 Colab Training Notebook (Unsloth/TRL/GRPO)](https://github.com/archittmittal/MetaxBangalore/blob/main/notebooks/colab_training.py)
+*Optimized for onsite fine-tuning of 7B-parameter reasoning models.*
 
 ---
 
