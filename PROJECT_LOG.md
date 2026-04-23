@@ -21,21 +21,17 @@ Refactor a proto-environment into a production-grade, package-based repository t
 
 ### 2. Professional Package Restructuring
 - **Action**: Migrated core logic to a standalone `conflict_env/` package.
-- **Structural Changes**:
-    - `env.py`, `models.py`, `scenarios.py`, `actors.py` -> Moved to `conflict_env/`.
-    - `test_api.py`, `test_client.py` -> Moved to `tests/`.
-    - Implemented internal **Relative Imports** (`from .models import ...`) to ensure the package is self-contained.
 - **Outcome**: Improved maintainability and library portability.
 
-### 3. "Mission Control" Documentation Overhaul
-- **Action**: Redesigned `README.md` with a high-impact, cinematic technical style.
-- **Refinement**: Removed all emojis per user request and added technical call-outs (GitHub Alerts) for protocol details.
-- **Outcome**: A premium first-impression for hackathon judges.
-
-### 4. Cloud Deployment (Hugging Face Spaces)
+### 3. Cloud Deployment (Hugging Face Spaces)
 - **Action**: Hosted the environment on Hugging Face Spaces using a Docker SDK.
 - **Endpoint**: [purvansh01/conflict-env](https://huggingface.co/spaces/purvansh01/conflict-env)
-- **Optimization**: Added a root `/` endpoint to provide environment metadata and status, resolving 404 errors during platform health checks.
+
+### 4. Battle of the Agents (RL vs LLM)
+- **Action**: Implemented a dual-agent training and evaluation framework.
+- **Gym Wrapper**: Created `gym_wrapper.py` to vectorize observations for standard RL libraries (Stable Baselines3).
+- **LLM Agent**: Implemented `llm_agent.py` with a structured prompt generator that provides semantic context for reasoning under schema drift.
+- **Outcome**: Successfully ran a 1000-step PPO baseline and verified LLM prompt logic across multiple scenarios.
 
 ---
 
