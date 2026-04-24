@@ -7,7 +7,7 @@ sdk: docker
 pinned: false
 ---
 
-# 🗓️ ConflictEnv: The Personal Assistant Stress Test
+# 🗓️ ConflictEnv: The Personal Assistant Stress Test:
 
 **A Unified Full-Spectrum Benchmark for Reasoning-Based Scheduling & Social Nuance.**
 
