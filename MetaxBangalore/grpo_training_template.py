@@ -49,22 +49,29 @@ train_dataset = Dataset.from_list(data)
 def reward_conflict_resolution(prompts, completions, **kwargs):
     """Checks if the model actually fixed the calendar."""
     rewards = []
-    env = ConflictEnv()
     for prompt, completion in zip(prompts, completions):
+        # C2: Initialize a fresh environment for each sample to prevent state leakage
+        env = ConflictEnv()
         # Reset environment with 'auto' difficulty (Adaptive Curriculum)
         env.reset(task_name="auto")
         
         # Parse completion for reasoning and action
         try:
             if "<thought>" in completion and "{" in completion:
-                # Extract JSON action
-                action_str = completion.split("}")[0].split("{")[1] + "}"
-                env.step(ConflictAction.model_validate_json(action_str))
+                # Improved JSON extraction: find first '{' and last '}'
+                start = completion.find("{")
+                end = completion.rfind("}") + 1
+                if start != -1 and end != -1:
+                    action_str = completion[start:end]
+                    env.step(ConflictAction.model_validate_json(action_str))
                 reward_data = env.get_reward()
                 rewards.append(reward_data)
             else:
                 rewards.append(0.05)
-        except:
+        except (json.JSONDecodeError, KeyError, ValueError) as e:
+            # C1: Avoid bare except; log specific errors
+            import sys
+            print(f"    [REWARD ERROR] {e}", file=sys.stderr)
             rewards.append(0.05)
     return rewards
 
