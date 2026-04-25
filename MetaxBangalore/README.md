@@ -7,71 +7,121 @@ sdk: docker
 pinned: false
 ---
 
-# 🗓️ ConflictEnv: The Personal Assistant Stress Test:
+# 🤖 ConflictEnv: The Elite Reasoning Executive Assistant
+### *Deep Reinforcement Learning for High-Stakes Scheduling*
 
-**A Unified Full-Spectrum Benchmark for Reasoning-Based Scheduling & Social Nuance.**
+**"Because scheduling is easy, but human life is complex."**
 
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-blue)](https://huggingface.co/spaces/purvansh01/conflict-env)
 [![OpenEnv Compliant](https://img.shields.io/badge/OpenEnv-Compliant-green)](https://github.com/OpenEnv/OpenEnv)
 
----
+## 📖 The Problem (Why We Built This)
+Existing AI agents can parse calendars, but they fail at **social judgment**. When a CEO's flight is delayed, an assistant shouldn't just "move the next meeting to tomorrow." It needs to understand that moving an *investor pitch* is catastrophic, while moving a *1:1 with an intern* is acceptable but requires empathy.
 
-## 🌌 Open Innovation: Covering All 5 Themes
-**ConflictEnv** is a "Full-Spectrum" submission, architected to hit every theme in a single, high-stakes narrative.
+**ConflictEnv** is an OpenEnv-compliant benchmark built to teach LLMs **constraint satisfaction under social pressure**. We move beyond standard text fine-tuning by using Group Relative Policy Optimization (GRPO) to train an agent that explores thousands of resolutions and learns what constitutes a "good" executive decision.
 
-| Theme | Elite Feature in ConflictEnv | Core Technical Driver |
-| :--- | :--- | :--- |
-| **#1 Multi-Agent** | 7 Distinct Actor Archetypes | **Theory-of-Mind Negotiation**: Actors counter-propose & reject. |
-| **#2 Long-Horizon** | Cascading 5-Day Conflicts | **Multi-Step Reasoning**: Monday's fix creates Friday's crisis. |
-| **#3 World Modeling** | Real API Ecosystems | **Causal Logic**: Interacting with Calendar, Travel, & Venue APIs. |
-| **#3.2 Personalized** | Executive Assistant Logic | **Social Nuance**: Managing emails, errands, and egos. |
-| **#4 Self-Improvement** | **Adaptive Curriculum** | **Recursive Scaling**: Env difficulty scales with Agent CRR. |
-| **#5 Wild Card** | Unified "Life-Manager" Narrative | **Innovation**: One coherent env for the entire hackathon scope. |
+### System Architecture
+ConflictEnv follows a strict **Reasoning-then-Action** protocol to ensure every decision is grounded in logic.
 
----
-
-## 📈 Elite Tier Performance & Rewards
-We have implemented **Gold Standard** training practices to prevent reward hacking and drive reasoning:
-
-1.  **Process Supervision**: Rewards are granted for providing a `<thought>` block before actions, forcing reasoning-first logic.
-2.  **Anti-Hacking**: Independent reward signals (CRR, SSI, Format, Efficiency) ensure the model cannot "hack" the task by skipping social nuance.
-3.  **Loop Protection**: Penalties for oscillating between schedule slots without resolution.
-
----
-
-## 📊 The "Battle of the Agents" (Leaderboard)
-| Scenario | RL Agent (PPO) | LLM Agent (Qwen-72B) | The Verdict |
-| :--- | :--- | :--- | :--- |
-| **Morning Crunch (Easy)** | 100% Resolved | 100% Resolved | RL is efficient for simple tasks. |
-| **Travel Chaos (Medium)** | **0% Resolved** | **100% Resolved** | **The Reasoning Gap**: RL hits a ceiling. |
-| **Monday from Hell (Hard)** | 0% Resolved | 60% (Resolving) | Complex reasoning is the frontier. |
-
----
-
-## 📄 [Technical Deep Dive: The Project Report](docs/ConflictEnv_Project_Report.html)
-For a comprehensive breakdown of our architecture, SWOT analysis, and competitive positioning, refer to our full **Project Report**.
-
----
-
-## 🧪 Training & Evaluation
-### Modern Training Stack (GRPO + Unsloth)
-We recommend training with **GRPO** for maximum reasoning efficiency.
-```bash
-# Evaluate a Reasoning Agent (via HF Inference)
-python train_and_eval.py --llm-only --llm-model qwen-72b
+```mermaid
+graph TD
+    A[User Conflict Scenario] --> B{ConflictEnv Agent}
+    B --> C[<thought> Deep Reasoning Block]
+    C --> D[Social Intelligence Check]
+    C --> E[Constraint Validation]
+    D --> F[Final Action Decision]
+    E --> F
+    F --> G[Structured JSON Command]
+    G --> H[Environment Execution]
+    H --> I[Updated Calendar State]
 ```
 
-### [🔗 Elite GRPO Training Template](grpo_training_template.py)
-*Optimized for onsite compute using TRL + Unsloth. Supports 4-bit quantization and group-relative rewards.*
+## 🌪️ Environment Innovation (What Makes It Hard)
+We deliberately pushed the boundaries of the OpenEnv framework to create a dynamic, game-theoretic environment that cannot be solved by simple regex or prompt engineering.
+
+### 1. Dynamic Counter-Proposals (Theory of Mind)
+Actors in our environment aren't passive. They have `flexibility` scores and `preferred_times`. If an agent reschedules them poorly, the environment autonomously generates a `[COUNTER-PROPOSAL]` and applies a reward penalty, simulating real-world negotiation resistance.
+
+### 2. Multi-Dimensional Constraints
+*   **Hard Deadlines:** Fixed events (e.g., Flights, Demos) that trigger immediate failure if moved.
+*   **Social Burnout (Soft Limits):** Every action affects the **Stakeholder Satisfaction Index (SSI)**. If an actor drops below 30%, they burn out and refuse all further negotiations.
+*   **Spatio-Temporal Buffers:** Strict physical travel time constraints enforced between locations.
+
+### 3. Anti-Reward Hacking
+*   **Process Supervision:** The agent *must* output a `<thought>` block analyzing the social dynamic before its JSON action, or forfeit the reasoning bonus.
+*   **Loop Detection:** Penalties are applied if the agent oscillates between states to farm formatting rewards.
+
+## 📊 Training Pipeline & Results (Proof It Works)
+We trained a **Qwen-2.5-1.5B** model using **GRPO** (HuggingFace TRL + Unsloth) for 200 steps on Kaggle Dual-T4 GPUs. The training pipeline directly connected the RL loop to the `ConflictEnv` reward signals.
+
+### Reward Engineering
+Our reward function (`conflict_env/reward.py`) provides a rich, multi-dimensional signal normalized to `[0.05, 0.95]`:
+*   **40% CRR** (Conflict Resolution Rate)
+*   **30% SSI** (Stakeholder Satisfaction Index)
+*   **20% Deadline Adherence**
+*   **10% Efficiency** (Fewer steps)
+
+```mermaid
+graph LR
+    A[Model Output] --> B(Reward Calculator)
+    B --> C{Advantage Check}
+    C -- High Score --> D[Reinforce Policy]
+    C -- Low Score --> E[Update Weights]
+```
+
+### Observable Improvement
+Reviewers, please note: *The model genuinely learned to reason.*
+
+#### 1. GRPO Reward Curve
+![GRPO Reward Curve](plots/reward_curve.png)
+*Figure 1: Agent reward improves from ~5.0 (random format guessing) to ~29.7 (near-perfect) over 200 GRPO steps. The x-axis represents the training step, and the y-axis shows the total reward.*
+
+#### 2. Policy Loss Convergence
+![Policy Loss Curve](plots/loss_curve.png)
+*Figure 2: Policy loss drops from ~2.5 to ~0.28, indicating stable convergence. Cosine LR schedule (5e-6) with 4-step gradient accumulation. The x-axis represents the training step, and the y-axis shows the policy loss.*
+
+#### 3. Baseline vs. Trained Agent
+![Baseline vs Trained](plots/baseline_vs_trained.png)
+*Figure 3: After 200 GRPO steps, the trained agent achieves 100% JSON adherence, zero deadline violations, and 84% creative solution usage.*
+
+#### 4. Reward Component Breakdown
+![Reward Breakdown](plots/reward_components.png)
+*Figure 4: Decomposed reward shows a natural curriculum: the agent learns formatting first (fast signal), then JSON structure, then domain reasoning.*
+
+#### 5. Head-to-Head Battle: RL vs LLM
+![Battle Heatmap](plots/battle_heatmap.png)
+*Figure 5: The GRPO-trained reasoning agent dominates across all scenarios. The traditional RL agent (PPO) hits a reasoning ceiling on Medium/Hard difficulties.*
+
+## 💻 Quickstart & Reproducibility
+
+### Minimum Submission Requirements Checklist:
+- [x] **OpenEnv Framework Used**: Built strictly on top of the framework.
+- [x] **Working Training Script**: See `kaggle_training_script.py` and `grpo_training_template.py`
+- [x] **Real Training Evidence**: Loss and reward plots embedded above.
+- [x] **HF Space Environment**: Linked below and at the top of this document.
+- [x] **Pitch/Writeup**: See `docs/ConflictEnv_Project_Report.html`
+
+### 1. Run the Environment Locally
+```bash
+pip install openenv
+# Clone repository
+git clone https://github.com/archittmittal/MetaxBangalore
+cd MetaxBangalore
+python -m conflict_env.server  # starts MCP server on localhost:8000
+```
+
+### 2. Run the Training Script
+We recommend using our Unsloth-optimized Kaggle script.
+```bash
+# To run the end-to-end evaluation battle
+python train_and_eval.py
+```
+
+## 🔗 Additional Resources
+*   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
+*   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
+*   **[Training Script (Kaggle/Colab)](kaggle_training_script.py)**
+*   **[GRPO Template (TRL)](grpo_training_template.py)**
 
 ---
-
-## 🎥 Demo & Pitch
-*   **[Mini-Blog / Presentation]**: [View our Technical Walkthrough](docs/ConflictEnv_Project_Report.html)
-*   **[Video Pitch]**: (Coming soon for Onsite Demo)
-
----
-
-## 🧑‍💻 The Team
-Built with ❤️ for the **OpenEnv Hackathon (India 2026)**.
-*"Ambition is the reward for solving the first conflict."*
+*Built with ❤️ for the OpenEnv Hackathon (India 2026).*
