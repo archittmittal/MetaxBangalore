@@ -82,8 +82,7 @@ Reviewers, please note: *The model genuinely learned to reason.*
 *Figure 2: Policy loss drops from ~2.5 to ~0.28, indicating stable convergence. Cosine LR schedule (5e-6) with 4-step gradient accumulation. The x-axis represents the training step, and the y-axis shows the policy loss.*
 
 #### 3. Baseline vs. Trained Agent
-![Baseline vs Trained](<img width="2100" height="1371" alt="image" src="https://github.com/user-attachments/assets/1b591065-87be-42ec-94b4-9ec096a040fa" />
-)
+![Baseline vs Trained](plots/baseline_vs_trained.png)
 *Figure 3: After 200 GRPO steps, the trained agent achieves 100% JSON adherence, zero deadline violations, and 84% creative solution usage.*
 
 #### 4. Reward Component Breakdown
