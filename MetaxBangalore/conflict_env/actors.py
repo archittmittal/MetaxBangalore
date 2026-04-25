@@ -209,6 +209,12 @@ def compute_satisfaction_delta(
 def apply_satisfaction_delta(actor: Actor, delta: float) -> None:
     """Apply a satisfaction delta, clamping to [0.0, 1.0]."""
     actor.satisfaction = round(max(0.0, min(1.0, actor.satisfaction + delta)), 4)
+    
+    # --- BURNOUT MECHANIC (EXTRA HARDNESS) ---
+    # If satisfaction drops too low, the actor burns out, becomes stubborn, and demands empathy.
+    if actor.satisfaction < 0.3 and actor.flexibility != Flexibility.API:
+        actor.flexibility = Flexibility.VERY_LOW
+        actor.preferred_tone = "warm"
 
 
 # ---------------------------------------------------------------------------

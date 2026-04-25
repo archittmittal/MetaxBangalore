@@ -68,9 +68,10 @@ When the agent reschedules an event, the environment evaluates the affected acto
 ### 2. Adaptive Difficulty & Schema Drift
 The environment tracks the agent's **Rolling Conflict Resolution Rate (CRR)**. If the agent performs well, the environment auto-scales the difficulty to `hard`. It also simulates API **Schema Drift** across episodes to test the agent's structural robustness over time.
 
-### 3. Multi-Dimensional Constraints
+### 3. Multi-Dimensional & Physical Constraints
 *   **Hard Limits (Unmovable Events)**: The agent faces strict `[POLICY ERROR]` penalties if it attempts to move fixed events (e.g., Flights, Investor pitches).
-*   **Soft Limits (Social Satisfaction)**: Every action affects the **System Satisfaction Index (SSI)**. Canceling a meeting without querying preferences drastically lowers SSI and applies heavy penalties.
+*   **Soft Limits (Social Burnout)**: Every action affects the **System Satisfaction Index (SSI)**. If an actor's satisfaction drops below 30%, they experience **Burnout**, instantly dropping their flexibility to zero and refusing further negotiations without empathy.
+*   **Physical Travel Buffer**: The environment enforces a strict 15-minute spatio-temporal buffer between back-to-back events to account for real-world travel time.
 
 ### 4. Anti-Reward Hacking (Loop Detection)
 The environment maintains an `_action_history` state array to detect infinite loops (e.g., repeatedly rescheduling the same two events to farm formatting rewards). If a loop is detected, the episode is terminated with a failure state.

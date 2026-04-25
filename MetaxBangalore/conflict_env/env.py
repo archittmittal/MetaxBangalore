@@ -588,8 +588,9 @@ class ConflictEnv(Environment):
                 if ev_end < ev_start:
                     ev_end += 1440
 
-                # Check for overlap
-                if max(req_start, ev_start) <= min(req_end, ev_end):
+                # Check for overlap WITH a 15-minute travel buffer (Extra Hardness)
+                TRAVEL_BUFFER = 15
+                if max(req_start, ev_start - TRAVEL_BUFFER) <= min(req_end, ev_end + TRAVEL_BUFFER):
                     return True
             except (ValueError, IndexError):
                 continue
