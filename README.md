@@ -1,17 +1,21 @@
+---
+title: ConflictEnv - Elite Executive Assistant
+emoji: 🛸
+colorFrom: indigo
+colorTo: purple
+sdk: gradio
+sdk_version: "5.12.0"
+python_version: "3.10"
+app_file: hf_space/app.py
+pinned: false
+---
+
 # 🤖 ConflictEnv: The Elite Reasoning Executive Assistant
 ### *Deep Reinforcement Learning for High-Stakes Scheduling*
 
-[![OpenEnv Compliant](https://img.shields.io/badge/OpenEnv-Latest-blue.svg)](https://github.com/openenv/openenv)
-[![Model](https://img.shields.io/badge/Base_Model-Qwen_2.5_1.5B-green.svg)](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+**"Because scheduling is easy, but human life is complex."**
 
-## ⚠️ The Problem: Reasoning Under Constraint
-Standard LLMs are good at answering scheduling questions in isolation, but they fall apart when conflicts involve competing real-world constraints—a cancelled flight, a spouse's dinner reservation, a non-movable client demo, and a team standup all colliding on a Monday morning.
-
-This isn't a retrieval problem; it's a **Constraint Satisfaction** problem. The agent must:
-1.  **Identify Hard Deadlines** (Flights, Demos) vs. Negotiable events.
-2.  **Infer Third-party Solutions** (Delegation, Uber, Video Handoff).
-3.  **Produce Machine-Executable Actions** (Structured JSON), not just prose advice.
+ConflictEnv is a high-performance AI agent trained using **Group Relative Policy Optimization (GRPO)**. It is designed to resolve complex, overlapping scheduling conflicts by balancing **Hard Deadlines** (flights, demos) with **Social Satisfaction** (family time, mental health).
 
 ---
 
@@ -58,7 +62,7 @@ graph LR
 ## 📊 Training Results: GRPO Learning Evidence
 The model was trained for **150 steps** using Group Relative Policy Optimization (GRPO) on Kaggle Dual-T4 GPUs.
 
-### 📈 Reward Curve
+### 📈 Learning Curve
 <img src="https://github.com/user-attachments/assets/99952b4c-3b7e-4706-9150-ee0eaa94e2cb" width="800" alt="Agent Reward Growth">
 
 *Figure 1: Reward starts at ~5.0 (random format guessing) and stabilizes at ~29.7 by step 142. The upward trend shows the model learned constraint-aware resolution from environment feedback.*
