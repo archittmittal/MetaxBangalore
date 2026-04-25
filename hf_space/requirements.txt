@@ -6,3 +6,4 @@ sentencepiece
 protobuf
 peft
 bitsandbytes
+safetensors
