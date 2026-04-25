@@ -59,6 +59,27 @@ graph LR
 
 ---
 
+## 🌪️ Environment Complexity & Features
+To ensure the agent truly learns reasoning, the OpenEnv-compliant environment is built with **Dynamic Game-Theoretic Constraints** instead of static text prompts.
+
+### 1. Counter-Proposal Engine (Dynamic Negotiation)
+When the agent reschedules an event, the environment evaluates the affected actor's `flexibility` and `preferred_times`. If dissatisfied, the environment autonomously generates a **[COUNTER-PROPOSAL]** and applies a reward penalty, simulating real-world negotiation resistance.
+
+### 2. Adaptive Difficulty & Schema Drift
+The environment tracks the agent's **Rolling Conflict Resolution Rate (CRR)**. If the agent performs well, the environment auto-scales the difficulty to `hard`. It also simulates API **Schema Drift** across episodes to test the agent's structural robustness over time.
+
+### 3. Multi-Dimensional Constraints
+*   **Hard Limits (Unmovable Events)**: The agent faces strict `[POLICY ERROR]` penalties if it attempts to move fixed events (e.g., Flights, Investor pitches).
+*   **Soft Limits (Social Satisfaction)**: Every action affects the **System Satisfaction Index (SSI)**. Canceling a meeting without querying preferences drastically lowers SSI and applies heavy penalties.
+
+### 4. Anti-Reward Hacking (Loop Detection)
+The environment maintains an `_action_history` state array to detect infinite loops (e.g., repeatedly rescheduling the same two events to farm formatting rewards). If a loop is detected, the episode is terminated with a failure state.
+
+### 5. Strict OpenEnv Metrics
+The environment strictly complies with the `OpenEnv` standard (`reset`, `step`, `state`) and tracks dual-objective metrics: **CRR** (Logical Success) and **SSI** (Social Empathy), ensuring the agent optimizes for both.
+
+---
+
 ## 📊 Training Results: GRPO Learning Evidence
 The model was trained for **150 steps** using Group Relative Policy Optimization (GRPO) on Kaggle Dual-T4 GPUs.
 
