@@ -26,23 +26,23 @@ import matplotlib.ticker as ticker
 OUTPUT_DIR = "plots"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Kaggle Light Theme
+# Dark professional theme
 plt.rcParams.update({
-    "figure.facecolor": "#ffffff",
-    "axes.facecolor": "#f8f9fa",
-    "axes.edgecolor": "#dadce0",
-    "axes.labelcolor": "#202124",
-    "text.color": "#202124",
-    "xtick.color": "#5f6368",
-    "ytick.color": "#5f6368",
-    "grid.color": "#e8eaed",
-    "grid.alpha": 0.8,
+    "figure.facecolor": "#0d1117",
+    "axes.facecolor": "#161b22",
+    "axes.edgecolor": "#30363d",
+    "axes.labelcolor": "#c9d1d9",
+    "text.color": "#c9d1d9",
+    "xtick.color": "#8b949e",
+    "ytick.color": "#8b949e",
+    "grid.color": "#21262d",
+    "grid.alpha": 0.6,
     "font.family": "sans-serif",
     "font.size": 12,
     "axes.titlesize": 16,
     "axes.labelsize": 13,
-    "legend.facecolor": "#ffffff",
-    "legend.edgecolor": "#dadce0",
+    "legend.facecolor": "#161b22",
+    "legend.edgecolor": "#30363d",
     "legend.fontsize": 11,
     "figure.dpi": 150,
     "savefig.dpi": 200,
@@ -50,15 +50,15 @@ plt.rcParams.update({
     "savefig.pad_inches": 0.3,
 })
 
-# Kaggle Accent colors
-CYAN = "#20beff"   # Kaggle Light Blue
-GREEN = "#0f9d58"  # Material Green
-PURPLE = "#9c27b0"
-ORANGE = "#ff9800"
-RED = "#ea4335"    # Material Red
-PINK = "#e91e63"
-YELLOW = "#fbbc04"
-TEAL = "#00bfa5"
+# Accent colors (harmonious palette)
+CYAN = "#58a6ff"
+GREEN = "#3fb950"
+PURPLE = "#bc8cff"
+ORANGE = "#f0883e"
+RED = "#f85149"
+PINK = "#f778ba"
+YELLOW = "#d29922"
+TEAL = "#39d353"
 
 np.random.seed(42)
 
@@ -134,7 +134,7 @@ def plot_reward_curve():
     fig.text(0.5, -0.02,
              "Figure 1: Agent reward improves from ~5.0 (random guessing) to ~29.7 (near-perfect) "
              "over 200 GRPO steps on Kaggle Dual-T4 GPUs.",
-             ha="center", fontsize=10, color="#5f6368", style="italic")
+             ha="center", fontsize=10, color="#8b949e", style="italic")
 
     plt.savefig(f"{OUTPUT_DIR}/reward_curve.png")
     plt.close()
@@ -188,7 +188,7 @@ def plot_loss_curve():
     fig.text(0.5, -0.02,
              "Figure 2: Policy loss drops from ~2.5 to ~0.28, indicating stable convergence. "
              "Cosine LR schedule (5e-6) with 4-step gradient accumulation.",
-             ha="center", fontsize=10, color="#5f6368", style="italic")
+             ha="center", fontsize=10, color="#8b949e", style="italic")
 
     plt.savefig(f"{OUTPUT_DIR}/loss_curve.png")
     plt.close()
@@ -220,10 +220,10 @@ def plot_baseline_comparison():
     fig, ax = plt.subplots(figsize=(11, 6.5))
 
     bars1 = ax.bar(x - width/2, baseline_vals, width, color=RED, alpha=0.8,
-                   label="Base Qwen-2.5-1.5B (untrained)", edgecolor="#dadce0",
+                   label="Base Qwen-2.5-1.5B (untrained)", edgecolor="#30363d",
                    linewidth=0.5)
     bars2 = ax.bar(x + width/2, trained_vals, width, color=GREEN, alpha=0.8,
-                   label="ConflictEnv Agent (GRPO-trained)", edgecolor="#dadce0",
+                   label="ConflictEnv Agent (GRPO-trained)", edgecolor="#30363d",
                    linewidth=0.5)
 
     # Value labels on bars
@@ -265,7 +265,7 @@ def plot_baseline_comparison():
     fig.text(0.5, -0.02,
              "Figure 3: After 200 GRPO steps, the trained agent achieves 100% JSON adherence, "
              "zero deadline violations, and 84% creative solution usage.",
-             ha="center", fontsize=10, color="#5f6368", style="italic")
+             ha="center", fontsize=10, color="#8b949e", style="italic")
 
     plt.savefig(f"{OUTPUT_DIR}/baseline_vs_trained.png")
     plt.close()
@@ -322,7 +322,7 @@ def plot_reward_components():
 
     # Total line
     total = format_s + json_s + topic_s
-    ax.plot(steps, total, color="#202124", linewidth=1.5, alpha=0.7,
+    ax.plot(steps, total, color="#ffffff", linewidth=1.5, alpha=0.7,
             linestyle="--", label="Total Reward")
 
     ax.set_xlabel("Training Step")
@@ -348,7 +348,7 @@ def plot_reward_components():
     fig.text(0.5, -0.02,
              "Figure 4: Decomposed reward shows the agent learns formatting first (fast signal), "
              "then JSON structure, then domain reasoning — a natural curriculum.",
-             ha="center", fontsize=10, color="#5f6368", style="italic")
+             ha="center", fontsize=10, color="#8b949e", style="italic")
 
     plt.savefig(f"{OUTPUT_DIR}/reward_components.png")
     plt.close()
@@ -398,7 +398,7 @@ def plot_battle_heatmap():
     for i in range(len(scenarios)):
         for j in range(len(metrics)):
             val = rl_data[i, j]
-            color = "#ffffff" if val > 0.8 else "#202124"
+            color = "#0d1117" if val > 0.5 else "#c9d1d9"
             ax1.text(j, i, f"{val:.0%}", ha="center", va="center",
                      fontsize=12, fontweight="bold", color=color)
 
@@ -414,7 +414,7 @@ def plot_battle_heatmap():
     for i in range(len(scenarios)):
         for j in range(len(metrics)):
             val = llm_data[i, j]
-            color = "#ffffff" if val > 0.8 else "#202124"
+            color = "#0d1117" if val > 0.5 else "#c9d1d9"
             ax2.text(j, i, f"{val:.0%}", ha="center", va="center",
                      fontsize=12, fontweight="bold", color=color)
 
@@ -424,7 +424,7 @@ def plot_battle_heatmap():
     fig.text(0.5, -0.04,
              "Figure 5: The GRPO-trained reasoning agent (right) dominates across all scenarios, "
              "especially on medium/hard where the RL agent (left) hits a reasoning ceiling.",
-             ha="center", fontsize=10, color="#5f6368", style="italic")
+             ha="center", fontsize=10, color="#8b949e", style="italic")
 
     plt.savefig(f"{OUTPUT_DIR}/battle_heatmap.png")
     plt.close()
