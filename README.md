@@ -15,49 +15,43 @@ This isn't a retrieval problem; it's a **Constraint Satisfaction** problem. The 
 
 ---
 
-## 🏛️ Environment Overview
-**ConflictEnv** is an OpenEnv-compliant reinforcement learning environment that simulates complex overlapping calendar conflicts. The agent acts as an executive assistant and must resolve conflicts by issuing structured JSON commands.
+## 🏛️ System Architecture
+ConflictEnv follows a strict **Reasoning-then-Action** protocol to ensure every decision is grounded in logic.
 
-### 🔭 Observation Space
-At each episode, the agent receives a scenario describing:
-*   Calendar events with times, attendees, and priority levels.
-*   Contextual metadata (Executive role, Team availability).
-
-```json
-{
-  "scenario": "Your flight departs at 7:30 PM. A client demo is scheduled 6:30–7:15 PM at the office. Traffic is 45 min.",
-  "events": [
-    {"id": "e1", "name": "Client Demo", "start": "18:30", "end": "19:15", "priority": "high", "movable": true},
-    {"id": "e2", "name": "Flight DL404", "start": "19:30", "end": null, "priority": "hard", "movable": false}
-  ],
-  "context": {"executive_role": "VP Engineering", "team_available": ["Technical Lead", "PM"]}
-}
+```mermaid
+graph TD
+    A[User Conflict Scenario] --> B{ConflictEnv Agent}
+    B --> C[<thought> Deep Reasoning Block]
+    C --> D[Social Intelligence Check]
+    C --> E[Constraint Validation]
+    D --> F[Final Action Decision]
+    E --> F
+    F --> G[Structured JSON Command]
+    G --> H[Environment Execution]
+    H --> I[Updated Calendar State]
 ```
-
-### 🎯 Action Space
-The agent emits a structured JSON command from a fixed action schema:
-
-| Action | Parameters | When to use |
-| :--- | :--- | :--- |
-| `delegate_meeting` | `event_id`, `assignee` | Reassign to available team member |
-| `reschedule_event` | `event_id`, `new_time` | Move a flexible event |
-| `cancel_event` | `event_id`, `notify` | Cancel with optional notification |
-| `book_transport` | `service`, `pickup_time` | Uber/taxi coordination |
-| `split_attendance` | `event_id`, `attend_minutes`| Partial attendance then handoff |
 
 ---
 
-## ⚖️ Reward Function
-The reward is composable across three rubrics using **OpenEnv's Rubric System**:
+## 🚀 The Innovation: GRPO-Driven Reasoning
+While most assistants use standard fine-tuning, ConflictEnv uses **GRPO** (the reinforcement learning algorithm behind **DeepSeek-R1**). 
 
-| Rubric | Max Points | What triggers it |
-| :--- | :--- | :--- |
-| **$R_{format}$** | 10 | Valid `<thought>` tag + parseable JSON action |
-| **$R_{logic}$** | 15 | No hard deadline moved; conflict actually resolved |
-| **$R_{social}$** | 5 | Stakeholder impact considered in reasoning block |
-| **Total** | **30** | — |
+Instead of being told what to say, the model explores thousands of possible resolutions and is rewarded for those that are both **logical** and **socially intelligent**.
 
-> **Hard Constraint**: Moving any event tagged `"movable": false` incurs a **-20 penalty**, making reward exploitation impossible.
+### ⚖️ Reward Engineering
+Our custom reward system shapes the model's behavior across three critical dimensions:
+
+1.  **Structural Reward ($R_{format}$)**: Ensures machine-parsable outputs. (+10pts for valid tags and JSON).
+2.  **Constraint Reward ($R_{logic}$)**: Penalizes moving "Hard Deadlines" like flights. (+15pts).
+3.  **Social Intelligence Reward ($R_{tone}$)**: Rewards analysis of stakeholder needs. (+5pts).
+
+```mermaid
+graph LR
+    A[Model Output] --> B(Reward Calculator)
+    B --> C{Advantage Check}
+    C -- High Score --> D[Reinforce Policy]
+    C -- Low Score --> E[Update Weights]
+```
 
 ---
 
@@ -71,29 +65,12 @@ The model was trained for **150 steps** using Group Relative Policy Optimization
 
 ### ⚖️ Baseline vs. Trained Agent
 
-| Metric | Base Qwen-2.5-1.5B (Untrained) | **ConflictEnv Agent (Trained)** |
+| Metric | Base Qwen-2.5-1.5B | **ConflictEnv Agent** |
 | :--- | :--- | :--- |
 | **JSON Output Adherence** | 0% | **100%** |
-| **Hard Deadline Violations** | 67% of resolutions | **0%** |
-| **3rd-Party Solutions (Uber/Delegate)** | Never | **84% of cases** |
+| **Hard Deadline Violations** | 67% | **0%** |
+| **3rd-Party Solutions (Uber/Delegate)** | Never | **84%** |
 | **Avg Reward Score** | 1.8 / 30 | **29.7 / 30** |
-
----
-
-## 🧠 Before vs. After (Qualitative)
-
-**Untrained Model Output:**
-> "You should probably reschedule your flight or ask your team to handle the demo. Let me know if you need more help!"
-
-**Trained Agent Output:**
-```text
-<thought>
-Flight DL404 is a hard deadline — cannot move. Demo ends at 19:15, leaving 15 min to reach 
-airport with 45 min traffic. Conflict is unresolvable by time alone. Best path: delegate demo 
-to Technical Lead, notify client of presenter change 2 hours prior.
-</thought>
-{"command": "delegate_meeting", "parameters": {"event_id": "e1", "assignee": "Technical Lead", "notify_client": true}}
-```
 
 ---
 
