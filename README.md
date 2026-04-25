@@ -52,7 +52,8 @@ graph LR
 The agent was trained for **150 steps** using Group Relative Policy Optimization (GRPO). Unlike static fine-tuning, this agent learned by interacting with the `ConflictEnv` reinforcement learning environment.
 
 ### 📈 Learning Curve
-![Agent Reward Growth](learning_curve.png)
+<img src="https://github.com/user-attachments/assets/99952b4c-3b7e-4706-9150-ee0eaa94e2cb" width="800" alt="Agent Reward Growth">
+
 *Figure 1: The reward started at ~5.0 (random guessing) and stabilized at ~30.0 (perfect format + strategic logic) by Step 142. This upward trend proves the model successfully learned from the environment's feedback.*
 
 ### ⚖️ Comparison: Baseline vs. Trained Agent
