@@ -8,4 +8,14 @@ huggingface_hub>=0.24.0
 python-dotenv>=1.0.0
 trl>=0.10.0
 unsloth>=2024.8
-# Note: unsloth and trl are for Linux/CUDA environments
+
+# HuggingFace Space Dependencies
+transformers
+torch
+accelerate
+gradio
+sentencepiece
+protobuf
+peft
+bitsandbytes
+safetensors
