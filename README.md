@@ -116,14 +116,14 @@ python -m conflict_env.server  # starts MCP server on localhost:8000
 We recommend using our Unsloth-optimized Kaggle script.
 ```bash
 # To run the end-to-end evaluation battle
-python train_and_eval.py
+python scripts/train_and_eval.py
 ```
 
 ## 🔗 Additional Resources
 *   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
 *   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
-*   **[Training Script (Kaggle/Colab)](kaggle_training_script.py)**
-*   **[GRPO Template (TRL)](grpo_training_template.py)**
+*   **[Training Script (Kaggle/Colab)](scripts/kaggle_training_script.py)**
+*   **[GRPO Template (TRL)](scripts/grpo_training_template.py)**
 
 ---
 *Built with ❤️ for the OpenEnv Hackathon (India 2026).*
