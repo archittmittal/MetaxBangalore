@@ -157,6 +157,47 @@ class ConflictEnv(Environment):
 
         return self._current_obs
 
+    def reset_with_scenario(self, scenario) -> ConflictObservation:
+        """
+        Reset the environment with a custom (real-world) scenario.
+
+        This allows injecting scenarios built from real calendar data
+        (e.g., Google Calendar ICS exports) instead of using the
+        pre-built archetypes.
+        """
+        logger.info(f"\n[ConflictEnv] Resetting with CUSTOM scenario: {scenario.name}")
+
+        self._episode_count += 1
+        self._scenario = scenario
+        self._scenario_name = scenario.name
+        self._difficulty = "custom"
+        self._drift_version = "v1"  # No drift for real-world data
+
+        # Initialize from the custom scenario
+        self._events = copy.deepcopy(scenario.events)
+        self._conflicts = copy.deepcopy(scenario.conflicts)
+        self._actors = scenario.actors
+        self._policy_rules = copy.deepcopy(scenario.policy_rules)
+        self._hard_deadlines = list(scenario.hard_deadlines)
+        self._hard_deadlines_met = []
+        self._pending_messages = []
+
+        # Reset step tracking
+        self._step_count = 0
+        self._max_steps = scenario.max_steps
+        self._done = False
+        self._escalated = False
+        self._action_history = []
+        self._has_loop = False
+        self._cumulative_reward = 0.10
+        self._last_step_reward = 0.0
+
+        # Build observation
+        self._last_feedback = f"[SCENARIO] {scenario.narrative}"
+        self._current_obs = self._build_observation()
+
+        return self._current_obs
+
     # ===================================================================
     #  OpenEnv Protocol: step
     # ===================================================================

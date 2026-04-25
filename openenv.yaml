@@ -1,0 +1,84 @@
+# OpenEnv Manifest — ConflictEnv
+name: conflict-env
+version: 1.0.0
+description: >
+  A unified RL environment for training LLM personal assistants on
+  cascading scheduling conflicts with dynamic schema drift.
+  Covers all 5 OpenEnv hackathon themes in one coherent environment.
+
+author: purvansh01
+license: MIT
+
+environment:
+  class: conflict_env.env.ConflictEnv
+  server: app:app
+
+  action_schema:
+    type: ConflictAction
+    fields:
+      command:
+        type: string
+        enum: [reschedule, draft_message, cancel, query_preference, escalate, confirm, resolve]
+      parameters:
+        type: object
+
+  observation_schema:
+    type: ConflictObservation
+    fields:
+      scenario_name: string
+      events: list
+      conflicts: list
+      actors: list
+      policy_rules: object
+      feedback: string
+      done: boolean
+      reward: float
+      schema_version: string
+
+  reward_range: [0.05, 0.95]
+
+  tasks:
+    - name: easy
+      description: 3 actors, 2 conflicts, cascade depth 1, 15 max steps, V1 schema
+    - name: medium
+      description: 5 actors, 4 conflicts, cascade depth 2, 25 max steps, V2 schema drift
+    - name: hard
+      description: 7+ actors, 6+ conflicts, cascade depth 3-5, 40 max steps, V3 schema drift
+    - name: auto
+      description: Adaptive difficulty based on rolling CRR (self-improvement curriculum)
+
+  scenarios:
+    - morning_crunch
+    - travel_chaos
+    - monday_from_hell
+    - deadline_squeeze
+    - social_minefield
+
+  features:
+    schema_drift: true
+    adaptive_difficulty: true
+    multi_agent_negotiation: true
+    cascading_conflicts: true
+    actor_counter_proposals: true
+
+endpoints:
+  reset: POST /reset
+  step: POST /step
+  state: GET /state
+  health: GET /health
+
+deployment:
+  platform: huggingface-spaces
+  sdk: docker
+  model: purvansh01/conflict-env-final
+  base_model: Qwen/Qwen2.5-1.5B-Instruct
+  training_method: GRPO (TRL GRPOTrainer)
+
+themes:
+  - "Theme 1: Multi-Agent Interactions (7 actors with counter-proposals)"
+  - "Theme 2: Long-Horizon Planning (5-day cascade chains, sparse end-reward)"
+  - "Theme 3: World Modeling (simulated APIs, partial observability, schema drift)"
+  - "Theme 4: Self-Improvement (adaptive difficulty + schema drift as forced generalization)"
+  - "Theme 5: Wild Card (first unified personal-agent benchmark across all themes)"
+
+bonus_prize: "Patronus AI — Consumer Workflows with Schema Drift"

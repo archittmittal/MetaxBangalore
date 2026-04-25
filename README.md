@@ -1,150 +1,172 @@
 ---
-title: ConflictEnv - Elite Executive Assistant
-emoji: 🛸
+title: ConflictEnv
+emoji: 🎯
 colorFrom: indigo
 colorTo: purple
-sdk: gradio
-sdk_version: "5.12.0"
-python_version: "3.10"
+sdk: docker
 app_file: app.py
 pinned: false
 ---
 
-# 🤖 ConflictEnv: The Elite Reasoning Executive Assistant
-### *Deep Reinforcement Learning for High-Stakes Scheduling*
+# ConflictEnv: A Social Negotiation Benchmark for LLM Agents
 
-**"Because scheduling is easy, but human life is complex."**
-
-ConflictEnv is a high-performance AI agent trained using **Group Relative Policy Optimization (GRPO)**. It is designed to resolve complex, overlapping scheduling conflicts by balancing **Hard Deadlines** (flights, demos) with **Social Satisfaction** (family time, mental health).
+ConflictEnv is a high-fidelity reinforcement learning environment designed to train and evaluate LLM-based personal assistants on cascading scheduling conflicts and dynamic schema drift. It provides a standardized framework for testing an agent's ability to navigate complex human dependencies, social prioritization, and breaking API contracts in real-time.
 
 ---
 
-## 🏛️ System Architecture
-ConflictEnv follows a strict **Reasoning-then-Action** protocol to ensure every decision is grounded in logic.
+## Executive Summary
+
+Most personal assistant benchmarks focus on static tool use or simple information retrieval. ConflictEnv addresses a more significant challenge: Social Negotiation. In this environment, a scheduling change is not just a database update; it is a ripple effect across a network of seven distinct stakeholders with competing interests and satisfaction curves.
+
+By integrating the Patronus AI Schema Drift engine, ConflictEnv also forces agents to maintain operational stability even when the underlying data structures (API field names, nesting, and protocols) mutate between episodes.
+
+---
+
+## System Architecture
 
 ```mermaid
 graph TD
-    A[User Conflict Scenario] --> B{ConflictEnv Agent}
-    B --> C[<thought> Deep Reasoning Block]
-    C --> D[Social Intelligence Check]
-    C --> E[Constraint Validation]
-    D --> F[Final Action Decision]
-    E --> F
-    F --> G[Structured JSON Command]
-    G --> H[Environment Execution]
-    H --> I[Updated Calendar State]
+    subgraph "Agent Space"
+        A[LLM Agent] -->|Action: Command + Params| B[OpenEnv API]
+    end
+
+    subgraph "ConflictEnv Core"
+        B --> C{Conflict Engine}
+        C -->|State Change| D[Calendar Logic]
+        D -->|Trigger| E[Cascade Manager]
+        E -->|Dependency Ripple| D
+    end
+
+    subgraph "Stakeholder Layer"
+        D --> F[Actor Satisfaction Models]
+        F -->|Counter Proposal| A
+    end
+
+    subgraph "Dynamic World Modeling"
+        G[Patronus Drift Engine] -->|Schema Mutation| B
+        G -->|Difficulty Scaling| C
+    end
+
+    D -->|Reward Signal| H[Multi-Signal Reward Computer]
+    H -->|Cumulative Rate| A
 ```
 
 ---
 
-## 🚀 The Innovation: GRPO-Driven Reasoning
-While most assistants use standard fine-tuning, ConflictEnv uses **GRPO** (the reinforcement learning algorithm behind **DeepSeek-R1**). 
+## Core Technical Features
 
-Instead of being told what to say, the model explores thousands of possible resolutions and is rewarded for those that are both **logical** and **socially intelligent**.
+### 1. Multi-Agent Negotiation Engine
+The environment simulates seven unique actor types:
+- Professional: Boss, Client
+- Personal: Spouse, Family
+- Institutional: School, Doctor, Airline
+Each actor possesses unique power-weights, satisfaction models, and the ability to generate counter-proposals during conflict resolution.
 
-### ⚖️ Reward Engineering
-Our custom reward system shapes the model's behavior across three critical dimensions:
+### 2. Cascading Conflict Logic
+A single modification to the calendar can trigger 3-5 levels of dependent conflicts. Agents must perform long-horizon planning to ensure that resolving a Monday conflict does not create an unresolvable failure on Friday.
 
-1.  **Structural Reward ($R_{format}$)**: Ensures machine-parsable outputs. (+10pts for valid tags and JSON).
-2.  **Constraint Reward ($R_{logic}$)**: Penalizes moving "Hard Deadlines" like flights. (+15pts).
-3.  **Social Intelligence Reward ($R_{tone}$)**: Rewards analysis of stakeholder needs. (+5pts).
+### 3. Dynamic Schema Drift (V1-V3)
+To simulate real-world API evolution, the environment supports three levels of schema drift:
+- Version 1: Baseline OpenEnv protocol.
+- Version 2: Field remapping (e.g., "title" to "event_name").
+- Version 3: Structural nesting (e.g., moving metadata into a "details" object).
 
+---
+
+## Technical Workflows
+
+### 1. Conflict Cascade Ripple
+```mermaid
+sequenceDiagram
+    participant A as Agent
+    participant C as Calendar
+    participant B as Boss
+    participant S as Spouse
+    
+    A->>C: Reschedule "Board Meeting" to 2 PM
+    C->>C: Detect Conflict: "Client Call" already at 2 PM
+    C->>B: Query Preference for "Board Meeting"
+    B-->>C: Accept (Power Weight: 0.9)
+    C->>S: Auto-reschedule "Anniversary Dinner" (Cascade Level 2)
+    S-->>A: COUNTER: "Only available after 7 PM"
+    A->>C: Finalize Solution
+```
+
+### 2. Schema Drift Lifecycle
 ```mermaid
 graph LR
-    A[Model Output] --> B(Reward Calculator)
-    B --> C{Advantage Check}
-    C -- High Score --> D[Reinforce Policy]
-    C -- Low Score --> E[Update Weights]
+    V1[V1: Baseline] -->|Field Remap| V2[V2: Field Drift]
+    V2 -->|Structural Nesting| V3[V3: Structural Drift]
+    
+    subgraph "Drift Example"
+        direction TB
+        d1["title: 'Meeting'"]
+        d2["event_name: 'Meeting'"]
+        d3["details: { name: 'Meeting' }"]
+    end
+    
+    V1 -.-> d1
+    V2 -.-> d2
+    V3 -.-> d3
 ```
 
 ---
 
-## 🌪️ Environment Complexity & Features
-To ensure the agent truly learns reasoning, the OpenEnv-compliant environment is built with **Dynamic Game-Theoretic Constraints** instead of static text prompts.
+## Hackathon Theme Alignment
 
-### 1. Counter-Proposal Engine (Dynamic Negotiation)
-When the agent reschedules an event, the environment evaluates the affected actor's `flexibility` and `preferred_times`. If dissatisfied, the environment autonomously generates a **[COUNTER-PROPOSAL]** and applies a reward penalty, simulating real-world negotiation resistance.
+ConflictEnv is designed to address all five core themes of the OpenEnv competition:
 
-### 2. Adaptive Difficulty & Schema Drift
-The environment tracks the agent's **Rolling Conflict Resolution Rate (CRR)**. If the agent performs well, the environment auto-scales the difficulty to `hard`. It also simulates API **Schema Drift** across episodes to test the agent's structural robustness over time.
-
-### 3. Multi-Dimensional & Physical Constraints
-*   **Hard Limits (Unmovable Events)**: The agent faces strict `[POLICY ERROR]` penalties if it attempts to move fixed events (e.g., Flights, Investor pitches).
-*   **Soft Limits (Social Burnout)**: Every action affects the **System Satisfaction Index (SSI)**. If an actor's satisfaction drops below 30%, they experience **Burnout**, instantly dropping their flexibility to zero and refusing further negotiations without empathy.
-*   **Physical Travel Buffer**: The environment enforces a strict 15-minute spatio-temporal buffer between back-to-back events to account for real-world travel time.
-
-### 4. Anti-Reward Hacking (Loop Detection)
-The environment maintains an `_action_history` state array to detect infinite loops (e.g., repeatedly rescheduling the same two events to farm formatting rewards). If a loop is detected, the episode is terminated with a failure state.
-
-### 5. Strict OpenEnv Metrics
-The environment strictly complies with the `OpenEnv` standard (`reset`, `step`, `state`) and tracks dual-objective metrics: **CRR** (Logical Success) and **SSI** (Social Empathy), ensuring the agent optimizes for both.
-
----
-
-## 📊 Training Results: GRPO Learning Evidence
-The model was trained for **150 steps** using Group Relative Policy Optimization (GRPO) on Kaggle Dual-T4 GPUs.
-
-### 📈 Learning Curve
-<img src="https://github.com/user-attachments/assets/99952b4c-3b7e-4706-9150-ee0eaa94e2cb" width="800" alt="Agent Reward Growth">
-
-*Figure 1: Reward starts at ~5.0 (random format guessing) and stabilizes at ~29.7 by step 142. The upward trend shows the model learned constraint-aware resolution from environment feedback.*
-
-### ⚖️ Baseline vs. Trained Agent
-
-| Metric | Base Qwen-2.5-1.5B | **ConflictEnv Agent** |
-| :--- | :--- | :--- |
-| **JSON Output Adherence** | 0% | **100%** |
-| **Hard Deadline Violations** | 67% | **0%** |
-| **3rd-Party Solutions (Uber/Delegate)** | Never | **84%** |
-| **Avg Reward Score** | 1.8 / 30 | **29.7 / 30** |
-
----
-
-## 💻 Quickstart
-
-### 1. Run the Environment
-```bash
-pip install openenv
-git clone https://github.com/archittmittal/MetaxBangalore
-cd MetaxBangalore
-python -m conflict_env.server  # starts MCP server on localhost:8000
-```
-
-### 2. Manual Episode Run
-```python
-from conflict_env.client import ConflictEnvClient
-
-env = ConflictEnvClient()
-obs = env.reset()
-print(obs["scenario"])
-
-action = '{"command": "delegate_meeting", "parameters": {"event_id": "e1", "assignee": "Technical Lead"}}'
-state, reward, done, info = env.step(action)
-print(f"Reward: {reward}")
-```
-
----
-
-## ⚙️ Technical Details
-| Feature | Specification |
+| Theme | Implementation Strategy |
 | :--- | :--- |
-| **Base Model** | Qwen 2.5 1.5B Instruct |
-| **Algorithm** | GRPO (Group Relative Policy Optimization) |
-| **Framework** | HuggingFace TRL + PEFT (LoRA) |
-| **Compute** | Kaggle Dual-T4 (~25 min per 150 steps) |
-| **Dataset** | 5,000 Custom Synthetic Conflict Scenarios |
+| Multi-Agent | Seven distinct actor types with individual satisfaction modeling. |
+| Long-Horizon | Multi-day cascading dependency chains requiring strategic foresight. |
+| World Modeling | Dynamic Schema Drift engine testing agent robustness against API mutation. |
+| Personal Tasks | Native integration with .ics and .json calendar data for personalized utility. |
+| Self-Improvement | Adaptive curriculum scaling difficulty based on rolling reward rates. |
 
 ---
 
-## 🏆 Why This Matters
-Scheduling conflicts are a universal, daily pain point—but they're unsolved at the reasoning level. Existing assistants handle logistics, not judgment. 
+## OpenEnv Protocol Documentation
 
-**ConflictEnv** trains models to handle exactly this gap: constraint satisfaction under social pressure, with machine-executable outputs. The same reasoning capability generalizes to any domain involving competing priorities—resource allocation, crisis triage, and project management.
+ConflictEnv is fully compliant with the OpenEnv REST API specification.
+
+### Endpoints
+
+#### POST /reset
+Initializes a new episode.
+- Parameters: `drift_version` (optional), `difficulty` (optional).
+- Returns: Initial observation and task description.
+
+#### POST /step
+Executes an agent action.
+- Parameters: `command`, `parameters`.
+- Returns: Observation, Reward, Terminated status, and SSI (Stakeholder Satisfaction Index).
+
+#### GET /state
+Returns the current raw state of the environment for inspection.
+
+#### GET /health
+Returns environment status, model metadata, and active drift version.
 
 ---
 
-## 🔗 Additional Materials
-*   [HuggingFace Space (Live Demo)]() <!-- User: Add link here -->
-*   [Colab Training Notebook]() <!-- User: Add link here -->
-*   [YouTube Walkthrough (< 2 min)]() <!-- User: Add link here -->
-*   [WandB Training Logs]() <!-- User: Add link here -->
+## Installation and Deployment
+
+### Docker Deployment
+The environment is optimized for deployment on Hugging Face Spaces or local Docker containers.
+
+```bash
+docker build -t conflict-env .
+docker run -p 7860:7860 conflict-env
+```
+
+### Local Development
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+---
+
+## Acknowledgments
+ConflictEnv was developed for the Meta x Bangalore Hackathon 2025. It leverages the OpenEnv framework and draws inspiration from the Patronus AI schema drift benchmarks.
