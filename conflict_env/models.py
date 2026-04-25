@@ -6,7 +6,7 @@ Extends OpenEnv base classes for protocol compliance.
 """
 
 from typing import Dict, Any, List, Optional
-from pydantic import Field
+from pydantic import Field, field_validator
 from openenv.core.env_server.types import Action, Observation, State
 
 
@@ -35,6 +35,15 @@ class ConflictAction(Action):
             "escalate, confirm, resolve."
         ),
     )
+
+    @field_validator("command")
+    @classmethod
+    def validate_command(cls, v: str) -> str:
+        """Ensure the command is recognized and clean it."""
+        v_clean = v.lower().strip()
+        if v_clean not in VALID_COMMANDS:
+            raise ValueError(f"Invalid command: {v}. Must be one of {VALID_COMMANDS}")
+        return v_clean
     parameters: Dict[str, Any] = Field(
         default_factory=dict,
         description=(

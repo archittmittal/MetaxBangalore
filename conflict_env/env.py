@@ -12,6 +12,7 @@ from __future__ import annotations
 import sys
 import random
 import copy
+import logging
 from typing import Any, Dict, List, Optional
 
 from openenv.core.env_server.interfaces import Environment
@@ -32,6 +33,9 @@ from .reward import (
     compute_crr,
     compute_ssi,
 )
+
+logger = logging.getLogger("conflict_env")
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 class ConflictEnv(Environment):
@@ -98,7 +102,7 @@ class ConflictEnv(Environment):
           - "easy", "medium", "hard" -- Fixed difficulty
           - "morning_crunch", etc. -- specific archetype
         """
-        sys.stderr.write(f"\n[ConflictEnv] Resetting -- task: {task_name}, episode: {self._episode_count}\n")
+        logger.info(f"\n[ConflictEnv] Resetting -- task: {task_name}, episode: {self._episode_count}")
 
         # --- Theme #4: Adaptive Curriculum ---
         if task_name == "auto":
@@ -109,14 +113,14 @@ class ConflictEnv(Environment):
             else:
                 difficulty = "hard"
             archetype = None
-            sys.stderr.write(f"[ConflictEnv] Adaptive Difficulty scaled to: {difficulty} (Rolling CRR: {self._rolling_crr:.2f})\n")
+            logger.info(f"[ConflictEnv] Adaptive Difficulty scaled to: {difficulty} (Rolling CRR: {self._rolling_crr:.2f})")
         else:
             difficulty, archetype = self._parse_task_name(task_name)
 
         # Update drift version based on episode count
         self._drift_version = get_drift_version(self._episode_count)
         self._difficulty = difficulty
-        sys.stderr.write(f"[ConflictEnv] Schema drift version: {self._drift_version}\n")
+        logger.info(f"[ConflictEnv] Schema drift version: {self._drift_version}")
 
         # Generate scenario
         seed = self._episode_count * 31 + hash(task_name) % 1000
@@ -164,7 +168,7 @@ class ConflictEnv(Environment):
         cmd = action.command.lower().strip()
         params = action.parameters
 
-        sys.stderr.write(f"[ConflictEnv] Step {self._step_count}: {cmd} {params}\n")
+        logger.info(f"[ConflictEnv] Step {self._step_count}: {cmd} {params}")
 
         # --- Validate command ---
         if cmd not in VALID_COMMANDS:
@@ -219,9 +223,9 @@ class ConflictEnv(Environment):
                 self._crr_history.pop(0)
             self._rolling_crr = sum(self._crr_history) / len(self._crr_history)
 
-            sys.stderr.write(
+            logger.info(
                 f"[ConflictEnv] Episode done -- Reward: {final['reward']:.4f}, "
-                f"CRR: {final['crr']:.2f}, Rolling CRR: {self._rolling_crr:.2f}\n"
+                f"CRR: {final['crr']:.2f}, Rolling CRR: {self._rolling_crr:.2f}"
             )
 
         self._current_obs = self._build_observation()
@@ -257,7 +261,7 @@ class ConflictEnv(Environment):
         action_key = f"{event_id}:{new_slot}"
         if self._action_history.count(action_key) >= 2:
             self._has_loop = True
-            sys.stderr.write(f"[ConflictEnv] [WARNING] Loop detected for action: {action_key}\n")
+            logger.warning(f"[ConflictEnv] [WARNING] Loop detected for action: {action_key}")
         self._action_history.append(action_key)
 
         event = self._find_event(event_id)
@@ -272,6 +276,20 @@ class ConflictEnv(Environment):
             return
 
         old_slot = event.get("start_time", "").split(" ")[-1] if " " in event.get("start_time", "") else ""
+        
+        # --- Policy Enforcement: Unmovable Events ---
+        if event.get("is_unmovable", False):
+            self._last_feedback = f"[POLICY ERROR] Event '{event_id}' ({event.get('title')}) is fixed and cannot be moved."
+            self._accumulate_reward(compute_step_reward("invalid_action"))
+            return
+        
+        # --- Policy Enforcement: Max Reschedules ---
+        max_resched = self._policy_rules.get("max_reschedules_per_event", 3)
+        current_resched = event.get("reschedule_count", 0)
+        if current_resched >= max_resched:
+            self._last_feedback = f"[POLICY ERROR] Event '{event_id}' has reached the maximum of {max_resched} reschedules."
+            self._accumulate_reward(compute_step_reward("invalid_action"))
+            return
 
         # Check for counter-proposals from affected actors
         available = [s for s in ALL_SLOTS if not self._slot_occupied(s, exclude_event=event_id)]
@@ -302,10 +320,11 @@ class ConflictEnv(Environment):
         # Update time
         date_prefix = event.get("start_time", "2026-04-25 00:00").split(" ")[0]
         event["start_time"] = f"{date_prefix} {new_slot}"
+        event["reschedule_count"] = event.get("reschedule_count", 0) + 1
         # Estimate end time (1 hour later)
         try:
             h, m = map(int, new_slot.split(":"))
-            event["end_time"] = f"{date_prefix} {h+1:02d}:{m:02d}"
+            event["end_time"] = f"{date_prefix} {(h+1)%24:02d}:{m:02d}"
         except ValueError:
             event["end_time"] = f"{date_prefix} {new_slot}"
 
@@ -538,14 +557,43 @@ class ConflictEnv(Environment):
 
     def _slot_occupied(self, slot: str, exclude_event: str = "") -> bool:
         """Check if a time slot is already occupied by an active event."""
+        # Convert requested slot to comparable minutes from midnight
+        try:
+            h, m = map(int, slot.split(":"))
+            req_start = h * 60 + m
+            # We assume a standard 60-minute duration for the "occupied" check
+            # unless we implement variable durations later.
+            req_end = req_start + 59 
+        except (ValueError, AttributeError):
+            return False
+
         for ev in self._events:
             if ev.get("event_id") == exclude_event:
                 continue
             if ev.get("status") == "cancelled":
                 continue
-            start = ev.get("start_time", "").split(" ")[-1] if " " in ev.get("start_time", "") else ""
-            if start == slot:
-                return True
+            
+            # Get event start/end in minutes
+            try:
+                s_part = ev.get("start_time", "").split(" ")[-1]
+                e_part = ev.get("end_time", "").split(" ")[-1]
+                
+                sh, sm = map(int, s_part.split(":"))
+                eh, em = map(int, e_part.split(":"))
+                
+                ev_start = sh * 60 + sm
+                ev_end = eh * 60 + em
+                
+                # Handle overnight wrap-around (e.g. 23:00 to 00:00)
+                if ev_end < ev_start:
+                    ev_end += 1440
+
+                # Check for overlap
+                if max(req_start, ev_start) <= min(req_end, ev_end):
+                    return True
+            except (ValueError, IndexError):
+                continue
+                
         return False
 
     def _check_conflict_resolution(self, changed_event_id: str) -> bool:
@@ -619,7 +667,7 @@ class ConflictEnv(Environment):
         self._cumulative_reward += delta
         self._cumulative_reward = clamp(self._cumulative_reward, 0.05, 0.95)
 
-        sys.stderr.write(
+        logger.info(
             f"[ConflictEnv] Reward delta={self._last_step_reward:.4f}, "
-            f"cumulative={self._cumulative_reward:.4f}\n"
+            f"cumulative={self._cumulative_reward:.4f}"
         )

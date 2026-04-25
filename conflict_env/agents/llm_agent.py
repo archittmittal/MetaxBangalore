@@ -140,6 +140,11 @@ What is your next action? Respond with a single JSON object."""
                 response_text = response.text.strip()
                 self.history.append({"role": "model", "parts": [response_text]})
 
+                # N6: Bound context window to prevent linear growth
+                MAX_HISTORY = 10  # Keep last 5 turns (user + model)
+                if len(self.history) > MAX_HISTORY:
+                    self.history = self.history[-MAX_HISTORY:]
+
                 action = self._parse_response(response_text)
                 return action
 

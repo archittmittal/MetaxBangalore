@@ -142,12 +142,12 @@ def _gen_morning_crunch(
         return f"{total // 60:02d}:{total % 60:02d}"
 
     # Event 1: Team standup (boss)
-    events.append(_make_event("evt_standup", "Team Standup", t("09:00"), t("09:30"), ["boss"], "high", True))
+    events.append(_make_event("evt_standup", "Team Standup", t("09:00"), t("09:30"), ["boss"], "high", True, False))
     hard_deadlines.append("evt_standup")
 
     # Event 2: School drop-off (spouse/school)
     school_actor = "school" if "school" in actors else "spouse"
-    events.append(_make_event("evt_school", "School Drop-off", t("08:45"), t("09:15"), [school_actor], "high", False))
+    events.append(_make_event("evt_school", "School Drop-off", t("08:45"), t("09:15"), [school_actor], "high", False, False))
 
     # Conflict: standup overlaps with school drop-off
     conflicts.append(_make_conflict("c1", "overlap", ["evt_standup", "evt_school"],
@@ -194,7 +194,7 @@ def _gen_travel_chaos(
     hard_deadlines = []
 
     # Event 1: Flight to Mumbai
-    events.append(_make_event("evt_flight", "Flight to Mumbai (6E-302)", "14:00", "16:30", ["airline"], "high", True))
+    events.append(_make_event("evt_flight", "Flight to Mumbai (6E-302)", "14:00", "16:30", ["airline"], "high", True, True))
     hard_deadlines.append("evt_flight")
 
     # Event 2: Client dinner
@@ -252,7 +252,7 @@ def _gen_monday_from_hell(
     hard_deadlines = []
 
     # Event 1: Board call (boss just moved it to 9AM)
-    events.append(_make_event("evt_board", "Board Strategy Call", "09:00", "10:30", ["boss"], "critical", True))
+    events.append(_make_event("evt_board", "Board Strategy Call", "09:00", "10:30", ["boss"], "critical", True, False))
     hard_deadlines.append("evt_board")
 
     # Event 2: Client demo (originally at 9AM, now conflicts)
@@ -264,7 +264,7 @@ def _gen_monday_from_hell(
                                     "ALERT: Boss just moved the board call to 9AM -- that's your client demo slot!"))
 
     # Event 3: Spouse dinner (non-negotiable)
-    events.append(_make_event("evt_dinner", "Anniversary Dinner", "19:30", "22:00", ["spouse"], "critical", True))
+    events.append(_make_event("evt_dinner", "Anniversary Dinner", "19:30", "22:00", ["spouse"], "critical", True, True))
     hard_deadlines.append("evt_dinner")
 
     if difficulty in ("medium", "hard"):
@@ -422,6 +422,7 @@ def _make_event(
     actor_ids: List[str],
     priority: str = "normal",
     is_hard_deadline: bool = False,
+    is_unmovable: bool = False,
 ) -> Dict[str, Any]:
     """Create a V1-format calendar event dict."""
     return {
@@ -432,6 +433,7 @@ def _make_event(
         "actor_ids": actor_ids,
         "priority": priority,
         "is_hard_deadline": is_hard_deadline,
+        "is_unmovable": is_unmovable,
         "status": "active",
     }
 

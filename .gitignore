@@ -1,6 +1,33 @@
-.venv/
+# Python
 __pycache__/
-*.pyc
-.DS_Store
-.env
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Large Files & Model Data (Go to Hugging Face instead)
+output/
+results/
+*.safetensors
+*.bin
+*.pth
+checkpoint-*/
+
+# Logs & Research
+logs/
+ppo_logs/
+PROJECT_LOG.md
 *.log
+
+# System
+.DS_Store
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.env
+
+# Scratch
+scratch/
+temp/
