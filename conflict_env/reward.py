@@ -154,10 +154,17 @@ def compute_step_reward(
         delta += actor_satisfaction_delta * 0.05  # Already negative
 
     # Action-specific micro-rewards
-    if action_result == "confirmed":
-        delta += 0.02
-    elif action_result == "invalid_action":
-        delta -= 0.03
+    action_rewards = {
+        "confirmed": 0.02,
+        "invalid_action": -0.03,
+        "rescheduled": 0.01,
+        "message_sent": 0.01,
+        "cancelled": -0.01,
+        "queried": 0.005,
+        "escalated": -0.10,
+        "counter_proposal": -0.02,
+    }
+    delta += action_rewards.get(action_result, 0.0)
 
     return round(clamp(delta, -0.10, 0.15), 4)
 

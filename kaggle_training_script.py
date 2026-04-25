@@ -1,21 +1,18 @@
-"""
-ConflictEnv -- Kaggle Training Script (Dual T4 / P100)
-======================================================
-Optimized for Kaggle Kernels. 
-Requires: Internet Enabled, HF_TOKEN in Kaggle Secrets.
-"""
-
 import os
+import json
+import re
 import subprocess
+import torch
+from datasets import Dataset
 
 # 1. Install Dependencies (Kaggle Specific)
 def install_deps():
-    print("[Kaggle] Installing Elite RL Stack (Unsloth, TRL, OpenEnv)...")
+    print("[Kaggle] Installing Elite RL Stack...")
     commands = [
         "pip install --upgrade pip",
         "pip install \"unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git\"",
         "pip install --no-deps \"trl<0.13.0\" peft accelerate bitsandbytes",
-        "pip install git+https://github.com/archittmittal/MetaxBangalore.git", # Install the environment package
+        "pip install git+https://github.com/archittmittal/MetaxBangalore.git",
         "pip install python-dotenv gymnasium stable-baselines3"
     ]
     for cmd in commands:
@@ -29,20 +26,10 @@ except ImportError:
     from unsloth import FastLanguageModel, PatchFastRL
     from trl import GRPOTrainer, GRPOConfig
 
-from conflict_env.env import ConflictEnv
-from conflict_env.models import ConflictAction
-from datasets import Dataset
-
 # Patch for RL efficiency
 PatchFastRL("GRPO", "Unsloth")
 
-# 2. Authenticate (using Kaggle Secrets)
-from kaggle_secrets import UserSecretsClient
-user_secrets = UserSecretsClient()
-hf_token = user_secrets.get_secret("HF_TOKEN")
-os.environ["HF_TOKEN"] = hf_token
-
-# 3. Load Model & Tokenizer
+# 2. Model & Tokenizer Configuration
 model_id = "Qwen/Qwen2.5-1.5B-Instruct"
 model, tokenizer = FastLanguageModel.from_pretrained(
     model_name = model_id,
@@ -59,65 +46,73 @@ model = FastLanguageModel.get_peft_model(
     lora_dropout = 0,
 )
 
-# 4. Load Dataset (From GitHub)
+# 3. Data Preparation (ChatML Optimized)
+SYSTEM_PROMPT = """You are an Elite Executive Assistant. Resolve scheduling conflicts using deep reasoning.
+Follow this format EXACTLY:
+<thought>
+Reasoning about social satisfaction and hard deadlines here.
+</thought>
+{JSON command}"""
+
+def apply_chatml_formatting(example):
+    prompt = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": f"Scenario: {example['scenario']}\nDifficulty: {example['difficulty']}"}
+    ]
+    # We leave the assistant part open for the model to generate <thought>
+    return {"prompt": tokenizer.apply_chat_template(prompt, tokenize=False, add_generation_prompt=True) + "<thought>\n"}
+
 import requests
 dataset_url = "https://raw.githubusercontent.com/archittmittal/MetaxBangalore/main/training_prompts.json"
 data = requests.get(dataset_url).json()
-train_dataset = Dataset.from_list(data)
+raw_dataset = Dataset.from_list(data)
+train_dataset = raw_dataset.map(apply_chatml_formatting)
 
-# 5. Reward Functions
-def reward_conflict_resolution(prompts, completions, **kwargs):
+# 4. Reward Functions
+def reward_format_check(completions, **kwargs):
+    responses = [c[0]["content"] for c in completions]
     rewards = []
-    env = ConflictEnv()
-    for prompt, completion in zip(prompts, completions):
-        env.reset(task_name="auto")
+    for response in responses:
+        score = 0.0
+        if "</thought>" in response: score += 15.0
         try:
-            if "<thought>" in completion and "{" in completion:
-                action_str = completion.split("}")[0].split("{")[1] + "}"
-                env.step(ConflictAction.model_validate_json(action_str))
-                rewards.append(env.get_reward())
-            else:
-                rewards.append(0.05)
-        except:
-            rewards.append(0.05)
+            thought_end = response.rfind("</thought>")
+            json_part = response[thought_end + 10:].strip()
+            if json_part.startswith("{") and json_part.endswith("}"):
+                json.loads(json_part)
+                score += 15.0
+        except: pass
+        rewards.append(score)
     return rewards
 
-def reward_format_check(prompts, completions, **kwargs):
-    rewards = []
-    for completion in completions:
-        if "<thought>" in completion and "</thought>" in completion:
-            rewards.append(1.0)
-        else:
-            rewards.append(0.0)
-    return rewards
+def reward_on_topic(completions, **kwargs):
+    responses = [c[0]["content"] for c in completions]
+    keywords = ["prioritize", "conflict", "meeting", "reschedule", "flight", "spouse"]
+    return [sum(1.0 for k in keywords if k in r.lower()) for r in responses]
 
-# 6. Training Config (Kaggle Optimized)
+# 5. Training Execution
 training_args = GRPOConfig(
-    output_dir = "/kaggle/working/conflict-env-qwen-1.5b-grpo",
+    output_dir = "output",
     learning_rate = 5e-6,
+    lr_scheduler_type = "cosine",
+    logging_steps = 1,
+    max_steps = 200, # Milestone 1
     per_device_train_batch_size = 1,
     gradient_accumulation_steps = 4,
-    num_generations = 4, 
+    num_generations = 4,
     max_prompt_length = 512,
     max_completion_length = 512,
-    num_train_epochs = 1,
-    logging_steps = 5,
-    report_to = "none", # Set to "wandb" if you have a key
     push_to_hub = True,
-    hub_model_id = "purvansh01/conflict-env-qwen-1.5b-grpo",
-    hub_token = hf_token,
+    hub_model_id = "purvansh01/conflict-env-qwen-grpo-v2",
+    save_steps = 100,
 )
 
-# 7. Initialize & Train
 trainer = GRPOTrainer(
     model = model,
-    reward_funcs = [reward_conflict_resolution, reward_format_check],
+    reward_funcs = [reward_format_check, reward_on_topic],
     args = training_args,
     train_dataset = train_dataset,
-    tokenizer = tokenizer,
 )
 
-if __name__ == "__main__":
-    print(f"[Kaggle] Starting GRPO Training Loop for {model_id}...")
-    trainer.train()
-    print("[Kaggle] Training Complete. Model pushed to Hugging Face Hub.")
+print("🚀 Starting Production Training Loop...")
+trainer.train()

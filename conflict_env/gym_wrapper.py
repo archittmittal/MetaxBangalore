@@ -25,8 +25,7 @@ from .models import ConflictAction
 COMMANDS = ["query_preference", "reschedule", "cancel", "confirm", "resolve"]
 RESCHEDULE_SLOTS = ["08:00", "09:00", "10:00", "11:00", "12:00",
                     "13:00", "14:00", "15:00", "16:00", "17:00"]
-ACTOR_KEYS = ["boss", "spouse", "client", "friend", "vendor",
-              "doctor", "child", "self"]
+ACTOR_KEYS = ["boss", "spouse", "client", "doctor", "school", "vendor", "friend", "airline"]
 MAX_EVENTS = 8
 MAX_CONFLICTS = 6
 

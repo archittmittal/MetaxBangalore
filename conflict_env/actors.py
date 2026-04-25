@@ -49,6 +49,7 @@ class Actor:
     priority_weight: float        # 0.0-1.0  (boss=0.95, friend=0.50)
     flexibility: Flexibility
     tone_sensitivity: ToneSensitivity
+    preferred_tone: str = "neutral"   # warm, friendly, professional, neutral, direct, blunt
     preferred_times: List[str] = field(default_factory=list)
     satisfaction: float = 1.0     # starts at 1.0, degrades with bad actions
     counter_proposals_made: int = 0
@@ -63,6 +64,7 @@ class Actor:
             "priority_weight": self.priority_weight,
             "flexibility": self.flexibility.name.lower(),
             "tone_sensitivity": self.tone_sensitivity.name.lower(),
+            "preferred_tone": self.preferred_tone,
             "preferred_times": self.preferred_times,
             "satisfaction": round(self.satisfaction, 3),
         }
@@ -79,48 +81,56 @@ def _default_actors() -> Dict[str, Actor]:
             actor_id="boss", name="Rajesh Mehta", role="boss", emoji="[BOSS]",
             priority_weight=0.95, flexibility=Flexibility.LOW,
             tone_sensitivity=ToneSensitivity.LOW,
+            preferred_tone="professional",
             preferred_times=["09:00", "10:00", "14:00"],
         ),
         "spouse": Actor(
             actor_id="spouse", name="Ananya", role="spouse", emoji="[SPOUSE]",
             priority_weight=0.90, flexibility=Flexibility.MEDIUM,
             tone_sensitivity=ToneSensitivity.HIGH,
+            preferred_tone="warm",
             preferred_times=["12:00", "18:00", "19:00", "20:00"],
         ),
         "client": Actor(
             actor_id="client", name="Sarah Chen", role="client", emoji="[CLIENT]",
             priority_weight=0.85, flexibility=Flexibility.LOW,
             tone_sensitivity=ToneSensitivity.MEDIUM,
+            preferred_tone="professional",
             preferred_times=["10:00", "11:00", "15:00"],
         ),
         "doctor": Actor(
             actor_id="doctor", name="Dr. Kapoor", role="doctor", emoji="[DOCTOR]",
             priority_weight=0.80, flexibility=Flexibility.VERY_LOW,
             tone_sensitivity=ToneSensitivity.LOW,
+            preferred_tone="direct",
             preferred_times=["09:30", "14:30"],
         ),
         "school": Actor(
             actor_id="school", name="Delhi Public School", role="school", emoji="[SCHOOL]",
             priority_weight=0.75, flexibility=Flexibility.MEDIUM,
             tone_sensitivity=ToneSensitivity.MEDIUM,
+            preferred_tone="formal",
             preferred_times=["08:00", "15:00", "16:00"],
         ),
         "vendor": Actor(
             actor_id="vendor", name="Priya Logistics", role="vendor", emoji="[VENDOR]",
             priority_weight=0.60, flexibility=Flexibility.HIGH,
             tone_sensitivity=ToneSensitivity.LOW,
+            preferred_tone="neutral",
             preferred_times=["10:00", "11:00", "14:00", "15:00", "16:00"],
         ),
         "friend": Actor(
             actor_id="friend", name="Arjun", role="friend", emoji="[FRIEND]",
             priority_weight=0.50, flexibility=Flexibility.HIGH,
             tone_sensitivity=ToneSensitivity.MEDIUM,
+            preferred_tone="casual",
             preferred_times=["17:00", "18:00", "19:00", "20:00", "21:00"],
         ),
         "airline": Actor(
             actor_id="airline", name="IndiGo Airlines", role="airline", emoji="[AIRLINE]",
             priority_weight=0.40, flexibility=Flexibility.API,
             tone_sensitivity=ToneSensitivity.NONE,
+            preferred_tone="neutral",
             preferred_times=[],  # API-governed
         ),
     }
@@ -180,9 +190,14 @@ def compute_satisfaction_delta(
 
     # --- Tone mismatch penalty ---
     if message_tone:
-        tone_score = _tone_score(message_tone)
-        mismatch = max(0, actor.tone_sensitivity.value - tone_score)
-        delta -= mismatch * 0.3
+        tone_score_used = _tone_score(message_tone)
+        tone_score_pref = _tone_score(actor.preferred_tone)
+        
+        # Absolute distance between used tone and preferred tone
+        tone_diff = abs(tone_score_used - tone_score_pref)
+        
+        # Sensitivity scales the penalty
+        delta -= tone_diff * actor.tone_sensitivity.value * 0.5
 
     # --- Preference match bonus ---
     if new_slot and new_slot in actor.preferred_times:
