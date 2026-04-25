@@ -48,4 +48,4 @@ def generate_prompts(num_samples=100):
     print(f"Successfully saved {len(dataset)} prompts to training_prompts.json")
 
 if __name__ == "__main__":
-    generate_prompts(150)
+    generate_prompts(5000)

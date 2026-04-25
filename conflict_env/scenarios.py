@@ -133,13 +133,21 @@ def _gen_morning_crunch(
     conflicts = []
     hard_deadlines = []
 
+    # Random offset for the whole morning (between -60 and +60 mins)
+    offset = rng.randint(-4, 4) * 15 # Multiples of 15 mins
+    
+    def t(time_str):
+        h, m = map(int, time_str.split(":"))
+        total = h * 60 + m + offset
+        return f"{total // 60:02d}:{total % 60:02d}"
+
     # Event 1: Team standup (boss)
-    events.append(_make_event("evt_standup", "Team Standup", "09:00", "09:30", ["boss"], "high", True))
+    events.append(_make_event("evt_standup", "Team Standup", t("09:00"), t("09:30"), ["boss"], "high", True))
     hard_deadlines.append("evt_standup")
 
     # Event 2: School drop-off (spouse/school)
     school_actor = "school" if "school" in actors else "spouse"
-    events.append(_make_event("evt_school", "School Drop-off", "08:45", "09:15", [school_actor], "high", False))
+    events.append(_make_event("evt_school", "School Drop-off", t("08:45"), t("09:15"), [school_actor], "high", False))
 
     # Conflict: standup overlaps with school drop-off
     conflicts.append(_make_conflict("c1", "overlap", ["evt_standup", "evt_school"],
@@ -147,20 +155,20 @@ def _gen_morning_crunch(
 
     if difficulty in ("medium", "hard"):
         # Event 3: Client prep call
-        events.append(_make_event("evt_client", "Client Prep Call", "09:00", "10:00", ["client"], "high", False))
+        events.append(_make_event("evt_client", "Client Prep Call", t("09:00"), t("10:00"), ["client"], "high", False))
         conflicts.append(_make_conflict("c2", "overlap", ["evt_standup", "evt_client"],
                                         "Client prep call overlaps with team standup."))
 
         # Event 4: Doctor appointment
-        events.append(_make_event("evt_doctor", "Doctor Checkup", "10:00", "11:00", ["doctor"], "medium", False))
+        events.append(_make_event("evt_doctor", "Doctor Checkup", t("10:00"), t("11:00"), ["doctor"], "medium", False))
         conflicts.append(_make_conflict("c3", "cascade", ["evt_client", "evt_doctor"],
                                         "If client call extends, it overlaps with doctor at 10."))
 
     if difficulty == "hard":
         # Event 5: Vendor delivery window
-        events.append(_make_event("evt_vendor", "Package Delivery", "09:30", "10:30", ["vendor"], "low", False))
+        events.append(_make_event("evt_vendor", "Package Delivery", t("09:30"), t("10:30"), ["vendor"], "low", False))
         # Event 6: Friend's breakfast
-        events.append(_make_event("evt_friend", "Breakfast with Arjun", "08:00", "09:00", ["friend"], "low", False))
+        events.append(_make_event("evt_friend", "Breakfast with Arjun", t("08:00"), t("09:00"), ["friend"], "low", False))
         conflicts.append(_make_conflict("c4", "overlap", ["evt_friend", "evt_school"],
                                         "Breakfast runs into school drop-off window."))
         conflicts.append(_make_conflict("c5", "cascade", ["evt_standup", "evt_vendor"],
