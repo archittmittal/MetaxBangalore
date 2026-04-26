@@ -41,7 +41,7 @@ except ImportError:
 from conflict_env.env import ConflictEnv
 from conflict_env.models import ConflictAction, ConflictObservation
 from conflict_env.inference import naive_agent_step, smart_agent_step
-from calendar_bridge import (
+from conflict_env.utils.calendar_bridge import (
     calendar_to_scenario, format_events_summary,
     parse_ics_file, parse_json_file, build_scenario,
 )
@@ -556,8 +556,8 @@ def training_insights():
 
 @app.get("/results.png")
 def serve_results_image():
-    if os.path.exists("results.png"):
-        return FileResponse("results.png", media_type="image/png")
+    if os.path.exists("docs/assets/results.png"):
+        return FileResponse("docs/assets/results.png", media_type="image/png")
     raise HTTPException(404, "results.png not found")
 
 
