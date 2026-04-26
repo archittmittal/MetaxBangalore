@@ -7,6 +7,8 @@
 [![OpenEnv Compliant](https://img.shields.io/badge/OpenEnv-Compliant-green)](https://github.com/OpenEnv/OpenEnv)
 [![Theme #5](https://img.shields.io/badge/Hackathon_Theme-5_Wild_Card-purple)](#themes-covered-the-wild-card-play)
 
+## 📺 [ConflictEnv Official Demo Video](https://youtu.be/TaVhJlouib4?si=ycyEp7aVV9fNk7gM)
+
 > ** Official Hackathon Submission for Theme #5 (Wild Card)**  
 > *Why choose one theme when you can tackle them all? ConflictEnv is a Wild Card submission engineered to naturally unify all hackathon themes (Multi-Agent Interactions, Long-Horizon Planning, World Modeling, and Self-Improvement) into a single, cohesive real-world challenge: cascading human scheduling conflicts.*
 
