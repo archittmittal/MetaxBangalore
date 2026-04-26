@@ -4,8 +4,8 @@
 
 ---
 
-> **🏆 Official Hackathon Submission**
-> This project directly targets **Theme #3.2: Personalized Tasks** (specifically the prompt: *"handling dinner conflicts due to work conflicts... executive assistant meeting planner"*) and **Theme #5: Wild Card** by introducing real-world schema drift and dynamic social constraints into the OpenEnv framework.
+> **🏆 Official Hackathon Submission: Theme #5 (Wild Card)**
+> *Why choose one theme when you can tackle them all?* ConflictEnv is a **Wild Card** submission engineered to naturally unify all four core hackathon themes—Multi-Agent Interactions, Long-Horizon Planning, World Modeling, and Self-Improvement—into a single, highly cohesive real-world challenge: managing cascading human scheduling conflicts under social pressure.
 
 ## TL;DR
 

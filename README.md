@@ -14,10 +14,10 @@ pinned: false
 
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-blue)](https://huggingface.co/spaces/purvansh01/conflict-env)
 [![OpenEnv Compliant](https://img.shields.io/badge/OpenEnv-Compliant-green)](https://github.com/OpenEnv/OpenEnv)
-[![Theme #3.2](https://img.shields.io/badge/Hackathon_Theme-3.2_Personalized_Tasks-purple)](#themes-covered-the-wild-card-play)
+[![Theme #5](https://img.shields.io/badge/Hackathon_Theme-5_Wild_Card-purple)](#themes-covered-the-wild-card-play)
 
-> **🎯 Official Hackathon Submission for Theme #3.2 (Personalized Tasks)**  
-> *The prompt for Theme #3.2 specifically asked for: "handling dinner conflicts due to work conflicts... executive assistant meeting planner." ConflictEnv is built exactly to solve this!*
+> **🎯 Official Hackathon Submission for Theme #5 (Wild Card)**  
+> *Why choose one theme when you can tackle them all? ConflictEnv is a Wild Card submission engineered to naturally unify all hackathon themes (Multi-Agent Interactions, Long-Horizon Planning, World Modeling, and Self-Improvement) into a single, cohesive real-world challenge: cascading human scheduling conflicts.*
 
 
 ##  The Problem Statement
