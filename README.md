@@ -6,6 +6,7 @@
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-blue)](https://huggingface.co/spaces/purvansh01/conflict-env)
 [![OpenEnv Compliant](https://img.shields.io/badge/OpenEnv-Compliant-green)](https://github.com/OpenEnv/OpenEnv)
 [![Theme #5](https://img.shields.io/badge/Hackathon_Theme-5_Wild_Card-purple)](#themes-covered-the-wild-card-play)
+[![Video Demo](https://img.shields.io/badge/Video_Demo-YouTube-red?logo=youtube)](https://youtu.be/TaVhJlouib4?si=ycyEp7aVV9fNk7gM)
 
 ## 📺 [ConflictEnv Official Demo Video](https://youtu.be/TaVhJlouib4?si=ycyEp7aVV9fNk7gM)
 
@@ -188,6 +189,7 @@ python scripts/train_and_eval.py
 
 ## 🔗 Additional Resources
 *   **[Technical Blog Post (Hackathon Writeup)](https://huggingface.co/spaces/purvansh01/conflict-env/discussions/1)**
+*   **[Video Demo (Watch on YouTube)](https://youtu.be/TaVhJlouib4?si=ycyEp7aVV9fNk7gM)**
 *   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
 *   **[Colab Training Notebook (Judges: Run Here)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/notebooks/conflictenv_training.ipynb)**
 *   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
