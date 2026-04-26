@@ -129,11 +129,8 @@ The agent's reward improved from ~0.45 (random format guessing) to ~0.94 (near-p
 <img width="800" alt="GRPO Training Progress" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_curve.png" />
 *Figure 1: Mean reward across GRPO generations. Note the explosive growth after the V3.1 guidance update.*
 
-<img width="800" alt="Policy Loss Convergence" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/loss_curve.png" />
-*Figure 2: Policy loss convergence indicating stable training.*
-
 <img width="800" alt="Reward Component Breakdown" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_components.png" />
-*Figure 3: Decomposed reward signals showing the emergence of different capabilities over time.*
+*Figure 2: Decomposed reward signals showing the emergence of different capabilities over time.*
 
 ---
 
@@ -163,10 +160,10 @@ The "Elite" behavior emerged last. Once it knew how to resolve conflicts, it beg
 
 *\*Creative Solutions: Percentage of successful episodes where the agent utilized non-mandatory social actions (`draft_message`, `query_preference`) to maintain Stakeholder Satisfaction instead of relying purely on rescheduling.*
 
-*\*\*Methodology: Evaluated over 50 randomized episodes across all difficulty tiers. Both models utilized the identical system prompt and context. The 0.94 score represents performance at the 0.95 reward ceiling defined by the OpenEnv protocol.*
+*\*Methodology: Evaluated over 50 randomized episodes across all difficulty tiers. Both models utilized the identical system prompt and context. The 0.94 score represents performance at the 0.95 reward ceiling defined by the OpenEnv protocol.*
 
 <img width="800" alt="Baseline vs Trained Comparison" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/baseline_vs_trained.png" />
-*Figure 4: Head-to-head comparison between the base model and the GRPO-tuned reasoning agent.*
+*Figure 3: Head-to-head comparison between the base model and the GRPO-tuned reasoning agent.*
 
 The untrained model literally could not produce valid JSON in our format. After training, it does so perfectly and uses creative strategies like `draft_message` to smooth over rescheduling.
 
@@ -206,7 +203,7 @@ To give PPO a fair shot, we provided it with a flattened discrete action space a
 The traditional RL agent struggled to bridge the gap between low-level state changes and high-level social prioritization, whereas the reasoning-first GRPO approach naturally prioritized stakeholders with higher social weights.
 
 <img width="800" alt="Battle Heatmap" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/battle_heatmap.png" />
-*Figure 5: Performance heatmap across different conflict scenarios (Easy to Hard).*
+*Figure 4: Performance heatmap across different conflict scenarios (Easy to Hard).*
 
 ### What Worked
 - **GRPO over PPO**: PPO requires a value function, which adds complexity. GRPO's group comparison is simpler and works better for text generation tasks.
