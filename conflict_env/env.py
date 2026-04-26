@@ -348,6 +348,7 @@ class ConflictEnv(Environment):
                 f"[COUNTER-PROPOSAL] {counter_proposal['message']}\n"
                 f"Consider their alternatives: {counter_proposal['alternatives']}"
             )
+            logger.info(f"[ConflictEnv] LLM Response: {counter_proposal['message']}")
             # Mild negative for triggering a rejection
             for actor_id in event.get("actor_ids", []):
                 actor = self._actors.get(actor_id)
