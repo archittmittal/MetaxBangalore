@@ -39,8 +39,45 @@ graph TD
     H --> I[Updated Calendar State]
 ```
 
-##  Our Approach: ConflictEnv (OpenEnv Native)
+## 🚀 Our Approach: ConflictEnv (OpenEnv Native)
 We built **ConflictEnv**, a high-fidelity RL environment strictly following the **OpenEnv protocol**, to train agents that don't just "solve" calendars, but **negotiate life**.
+
+### High-Level Workflow
+```mermaid
+graph TD
+    subgraph Initialization ["1. Episode Setup"]
+        S[Scenario Generator] -->|Tier Selection| D{Difficulty?}
+        D -->|Easy/Med/Hard| P[Procedural Calendar Setup]
+        V[Schema Drift Engine] -->|episode // 50| M[API Version V1/V2/V3]
+    end
+
+    subgraph AgentLoop ["2. Reasoning & Action Loop"]
+        O[Observation State] -->|JSON Schema| T[thought Reasoning Block]
+        T -->|Constraint Check| A[Action Selection]
+        A -->|Tool Call| API[Simulated Tool API]
+    end
+
+    subgraph EnvCore ["3. Conflict Cascade Engine"]
+        API -->|Reschedule/Cancel| C{Conflict?}
+        C -->|Yes| CE[Cascade Logic: 3-5 Levels Deep]
+        CE -->|Impact| AN[Actor Negotiation System]
+        AN -->|Counter-Proposal| O
+        C -->|No| O
+    end
+
+    subgraph Evaluation ["4. Reward & Terminal"]
+        O -->|Terminal State| R[Multi-Signal Reward Computer]
+        R -->|40% CRR| R1[Conflict Resolution Rate]
+        R -->|30% SSI| R2[Stakeholder Satisfaction]
+        R -->|20% Adh| R3[Deadline Adherence]
+        R -->|10% Eff| R4[Step Optimization]
+        R1 & R2 & R3 & R4 --> Final[Normalized Reward 0.05 - 0.95]
+    end
+
+    Initialization --> AgentLoop
+    AgentLoop --> EnvCore
+    EnvCore -->|Max Steps / All Resolved| Evaluation
+```
 
 ### 1. Cascading Conflict Engine
 In ConflictEnv, actions have consequences. Moving a dentist appointment might be the only way to attend a board meeting, but that dentist only has availability during your child's recital. Conflicts cascade **3–5 levels deep**, requiring the agent to reason through long-term dependencies.
