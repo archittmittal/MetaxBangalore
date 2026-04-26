@@ -15,7 +15,7 @@ if not hf_token:
 
 try:
     client = InferenceClient(
-        model="Qwen/Qwen2.5-1.5B-Instruct",
+        model="meta-llama/Llama-3.2-1B-Instruct",
         token=hf_token
     )
 except Exception as e:
