@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
 
+from .llm_client import generate_actor_message
+
 
 # ---------------------------------------------------------------------------
 #  Enums
@@ -256,15 +258,31 @@ def generate_counter_proposal(
     chosen = _rng.sample(alternatives, min(2, len(alternatives)))
     actor.counter_proposals_made += 1
 
+    # Try to get a dynamic response from the LLM
+    dynamic_message = generate_actor_message(
+        actor_name=actor.name,
+        actor_role=actor.role,
+        tone_sensitivity=actor.tone_sensitivity.name.lower(),
+        satisfaction=actor.satisfaction,
+        proposed_slot=proposed_slot,
+        alternatives=chosen
+    )
+
+    if dynamic_message:
+        final_message = f"{actor.emoji} {dynamic_message}"
+    else:
+        # Fallback to rules-based string if LLM times out
+        final_message = (
+            f"{actor.emoji} {actor.name}: \"{proposed_slot} doesn't work for me. "
+            f"How about {' or '.join(chosen)}?\""
+        )
+
     return {
         "actor_id": actor.actor_id,
         "actor_name": actor.name,
         "rejected_slot": proposed_slot,
         "alternatives": chosen,
-        "message": (
-            f"{actor.emoji} {actor.name}: \"{proposed_slot} doesn't work for me. "
-            f"How about {' or '.join(chosen)}?\""
-        ),
+        "message": final_message,
     }
 
 
