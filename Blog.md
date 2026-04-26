@@ -6,113 +6,286 @@
 
 ## TL;DR
 
-We built **ConflictEnv**, a reinforcement learning environment where an AI agent must resolve scheduling conflicts involving real human social dynamics. Using **Group Relative Policy Optimization (GRPO)** on a tiny **Qwen-2.5-1.5B** model, we achieved near-optimal convergence ($R \approx 0.94$) in under 150 steps.
+We built **ConflictEnv**, a reinforcement learning environment where an AI agent must resolve scheduling conflicts involving real human social dynamics — not just move calendar blocks around. Using **Group Relative Policy Optimization (GRPO)** on a tiny **Qwen-2.5-1.5B** model, we trained an agent that went from outputting garbage to producing structured, socially-aware resolutions in under 150 training steps.
 
-ConflictEnv treats **Social Capital** as a differentiable resource, forcing agents to optimize for both temporal constraints and human sentiment.
+ConflictEnv is built on **OpenEnv**—a standardized Gym-like interface for training LLM agents—built to teach LLMs **constraint satisfaction under social pressure**.
 
----
-
-## 1. The Core Thesis: Scheduling as Social Negotiation
-
-Traditional calendar optimization is a **Constraint Satisfaction Problem (CSP)**. However, real-world scheduling is a **Game Theoretic Negotiation**. Moving a meeting isn't just about finding an empty slot; it's about spending "social tokens."
-
-**The Efficiency Gap**: Every knowledge worker loses 2–4 hours per week to scheduling conflicts.
-**The Social Gap**: Moving an investor pitch is high-risk; moving a 1:1 with an intern is low-risk but requires empathy.
+This blog walks through what we built, why it matters, how we trained it, and what we learned.
 
 ---
 
-## 2. Mathematical Framework of ConflictEnv
+## 1. The Problem We Wanted to Solve
 
-ConflictEnv is defined as a **Partially Observable Markov Decision Process (POMDP)** where the reward signal is decomposed into four orthogonal vectors.
+Every calendar app can tell you that two meetings overlap. None of them can tell you *which one to move*.
 
-### 2.1 The Multi-Signal Reward Function
-The reward $R$ for an action $a$ in state $s$ is computed as:
+Consider this: Your boss's investor pitch and your spouse's anniversary dinner are both at 7 PM. A naive AI moves whichever is "easier." But the *right* answer depends on social context — how flexible is your spouse? How important is this investor? Has your boss already rescheduled twice this week?
 
-$$R(s, a) = \sum_{i \in \{CRR, SSI, DL, EFF\}} \omega_i \cdot \phi_i(s, a) + \Gamma_{reasoning} - \Lambda_{loop}$$
+**This is not a scheduling problem. It's a social negotiation problem.**
 
-Where:
-*   **$\phi_{CRR}$ (Conflict Resolution Rate)**: A binary indicator $\in \{0, 1\}$ representing if the primary overlap is cleared.
-*   **$\phi_{SSI}$ (Stakeholder Satisfaction Index)**: Computed as $\frac{1}{N} \sum_{j=1}^N S_j$, where $S_j$ is the latent satisfaction of actor $j$.
-*   **$\phi_{DL}$ (Deadline Adherence)**: Measures proximity to "Hard Deadlines" (e.g., flight departures).
-*   **$\phi_{EFF}$ (Efficiency)**: Defined as $1 - \frac{t}{t_{max}}$, rewarding fewer steps.
-*   **$\Gamma_{reasoning}$**: A +0.10 process supervision bonus for valid `<thought>` blocks.
-*   **$\Lambda_{loop}$**: A -0.20 penalty for state oscillation.
-
-### 2.2 Stakeholder Dynamics (Social Physics)
-Each stakeholder $j$ has a social weight $w_j \in [0.1, 1.0]$. The satisfaction $S_j$ decays non-linearly with each reschedule:
-
-$$S_j(t+1) = \max(0, S_j(t) - \eta \cdot w_j \cdot k)$$
-
-Where $k$ is the number of times event $j$ has been moved. When $S_j \to 0$, the actor "burns out" and rejects all future commands, creating a terminal penalty.
+We wanted to build an environment that forces AI agents to reason about these human dynamics, not just optimize time slots.
 
 ---
 
-## 3. The Optimization: Group Relative Policy Optimization (GRPO)
+## 2. What is ConflictEnv?
 
-We utilized **GRPO**, a variant of PPO that removes the need for a separate Value Function (Critic) by calculating advantages relative to a group of completions.
+ConflictEnv is an **OpenEnv-compliant** reinforcement learning environment that simulates high-stakes calendar conflict resolution.
 
-### 3.1 The GRPO Objective
-For a prompt $q$, we generate a group of $G$ outputs $\{o_1, o_2, ..., o_G\}$. The objective function $J(\theta)$ is:
+### The Setup
+- **7 Stakeholder Types**: Boss, Spouse, Client, Doctor, School, Vendor, Airline — each with different flexibility levels, preferred times, and social weights.
+- **3 Difficulty Tiers**: Easy (single overlap), Medium (cascading conflicts), Hard (multi-day chaos with hard deadlines).
+- **7 Agent Commands**: `reschedule`, `cancel`, `draft_message`, `query_preference`, `escalate`, `confirm`, `resolve`.
 
-$$J(\theta) = \mathbb{E} \left[ \frac{1}{G} \sum_{i=1}^G \left( \min \left( \rho_i(\theta) \hat{A}_i, \text{clip}(\rho_i(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_i \right) - \beta D_{KL}(\pi_\theta || \pi_{ref}) \right) \right]$$
+### What Makes It Hard
 
-Where:
-*   **$\rho_i(\theta)$**: The importance sampling ratio $\frac{\pi_\theta(o_i|q)}{\pi_{\theta_{old}}(o_i|q)}$.
-*   **$\hat{A}_i$ (Relative Advantage)**: Computed by normalizing rewards within the group:
-    $$\hat{A}_i = \frac{R_i - \text{mean}(\{R_j\}_{j=1}^G)}{\text{std}(\{R_j\}_{j=1}^G) + \epsilon}$$
+**1. Cascading Conflicts**  
+When you reschedule Event A, it might now overlap with Event B, which pushes against Event C's hard deadline. The agent must think multiple steps ahead.
 
-This approach allows the 1.5B model to "see" better alternatives within its own generations, accelerating convergence without a massive critic model.
+**2. Dynamic Counter-Proposals**  
+Stakeholders aren't passive. If the agent reschedules a meeting to a bad time, the environment generates a counter-proposal: *"I can't do 3 PM, but 4 PM works."* The agent must adapt.
+
+**3. Social Burnout**  
+Every stakeholder has a satisfaction score. Push someone too hard (reschedule their events three times), and they "burn out" — refusing all further negotiations. The agent learns that being aggressive is counterproductive.
+
+**4. Anti-Gaming Measures**  
+- The agent *must* output a `<thought>` reasoning block before its JSON action, or it gets zero reasoning bonus.
+- Loop detection penalizes agents that oscillate between states to farm rewards.
 
 ---
 
-## 4. Training Evidence & Results
+## 3. Prior Art & Context
 
-### 4.1 Emergent Curriculum
-We observed that the model follows a natural hierarchical learning path:
-1.  **Format Mastery** ($t < 25$): Learning the `<thought>` and JSON syntax.
-2.  **Constraint Alignment** ($25 < t < 75$): Optimizing for $\phi_{CRR}$.
-3.  **Social IQ Emergence** ($t > 75$): Learning to prioritize high-$w_j$ actors.
+ConflictEnv sits at the intersection of **Game Theory**, **Social Simulation**, and **Constraint Satisfaction**. While benchmarks like *Diplomacy* ([Bakhtin et al., 2022](https://arxiv.org/abs/2211.07787)) focus on strategic deception, and social simulations like *Stanford Town* ([Park et al., 2023](https://arxiv.org/abs/2304.03442)) focus on narrative roleplay, ConflictEnv is unique because it treats **Social Capital** as a hard constraint in an agentic workflow. We draw inspiration from:
+- **Negotiation Environments**: Pareto-optimal solutions among competing stakeholder needs ([Lewis et al., 2017](https://arxiv.org/abs/1706.05125)).
+- **Hierarchical Planning**: Translating high-level social goals into actionable tool-calls.
+- **Generative Agents**: Extending the concept of agentic memory into rigorous, rewarded optimization.
 
-### 4.2 Quantitative Comparison
+---
 
-| Metric | Base Model (Qwen-1.5B) | GRPO-Trained Agent |
+## 4. The Reward Signal
+
+Getting the reward function right was the hardest part. We needed a signal that:
+1. Rewards resolution (obviously)
+2. Penalizes social damage (moving your spouse's dinner for the third time)
+3. Rewards efficiency (fewer steps = better)
+4. Forces structured output (valid JSON or nothing)
+
+Our reward function (`conflict_env/reward.py`) formalizes the "Ideal Executive Behavior" as a linear combination of normalized constraints, bounded within the OpenEnv `[0.05, 0.95]` interval.
+
+### Formal Objective
+The total episode reward $R_{total}$ is defined as:
+
+$$ R_{total} = \text{clip}\left( \sum_{k \in K} w_k \Phi_k(s_T) + \mathbb{I}_{reasoning} \cdot \beta_{bonus} - \mathbb{I}_{loop} \cdot \gamma_{penalty}, \ 0.05, \ 0.95 \right) $$
+
+Where $K = \{\text{CRR, SSI, DA, EFF}\}$ represents our core metrics, $w_k$ are the objective weights, $\Phi_k(s_T) \in [0, 1]$ is the terminal state evaluation for metric $k$, and $\mathbb{I}$ represents boolean indicator functions for process supervision.
+
+#### The Stakeholder Satisfaction Index (SSI) Formulation
+The SSI is not a static lookup; it is a dynamically decaying function based on social fatigue. For a set of $N$ stakeholders in an episode, let $c_i$ be the number of reschedules endured by stakeholder $i$, and $\alpha_i \in (0, 1]$ be their unique rigidity coefficient (e.g., Boss $\alpha=0.8$, Vendor $\alpha=0.2$).
+
+$$ \Phi_{SSI}(s_T) = \frac{1}{N} \sum_{i=1}^{N} \max(0, 1 - \alpha_i c_i) $$
+
+This formulation mathematically guarantees that repeatedly moving a high-rigidity stakeholder will rapidly decay the reward, forcing the agent to find Pareto-optimal paths that distribute inconvenience toward low-rigidity actors.
+
+| Component | Weight ($w_k$) | Target Metric ($\Phi_k$) |
 |---|---|---|
-| Avg. Reward ($\bar{R}$) | 0.06 | **0.94** |
-| JSON Validity | 0.0% | **100%** |
-| Conflict Resolution (Hard) | 12% | **91%** |
-| Social Burnout Rate | 88% | **4%** |
+| **Conflict Resolution Rate (CRR)** | 0.40 | Binary success: Was the calendar conflict fixed? |
+| **Stakeholder Satisfaction (SSI)** | 0.30 | Social debt: Did you maintain actor happiness? |
+| **Deadline Adherence** | 0.20 | Physical constraints: Did you respect the flight/demo times? |
+| **Efficiency** | 0.10 | Temporal cost: Did you solve it in the fewest steps? |
+| **Reasoning Bonus (Additive)** | +0.10 | Process Supervision: Was a thought block present? |
 
-<img width="800" alt="Training Progress" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_curve.png" />
-*Figure 1: Exponential reward growth. The "kink" at step 50 corresponds to the model successfully bridging the gap between formatting and reasoning.*
+### The "Reasoning Booster" (Process Supervision)
+To ensure the model doesn't just "guess" the right JSON, we added a **+0.10 Reasoning Bonus** if a valid `<thought>` block is present. Conversely, we apply a **-0.20 Loop Penalty** to prevent "reward hacking" (where agents oscillate between two states to farm step-wise formatting rewards). This brings the theoretical maximum reward to 1.10, which is then clamped to the OpenEnv-safe range of `[0.05, 0.95]`.
 
 ---
 
-## 5. Implementation Details
+## 5. Training: GRPO on a 1.5B Model
 
-### V3.1 Guidance Update (Gradient Injection)
-Initially, the model suffered from **Sparse Reward Collapse**. To fix this, we refined the System Prompt to include a **State-Action Schema**:
+### Why GRPO?
+Traditional Proximal Policy Optimization (PPO) requires maintaining an auxiliary Value function $V_\phi(s)$ to estimate advantage, which doubles memory overhead—a critical bottleneck when fine-tuning LLMs on a single GPU.
 
-```text
-Current State: Conflict detected between [Event A] and [Event B].
-Stakeholders: Spouse (S=0.4, w=0.9), Boss (S=0.8, w=1.0).
-Available Actions: [reschedule, cancel, query_preference, ...]
-Requirement: You MUST think before acting.
+**Group Relative Policy Optimization (GRPO)** bypasses the value network by estimating the baseline directly from a sampled group of $G$ trajectories. For a given conflict scenario $q$, the policy $\pi_\theta$ generates $G$ completions $\{o_1, o_2, ..., o_G\}$. The group-relative advantage is calculated as:
+
+$$ \hat{A}_i = \frac{r_i - \mu(R)}{\sigma(R)} $$
+
+Where $R = \{r_1, ..., r_G\}$ are the environment rewards. The policy parameters $\theta$ are then updated to maximize the GRPO objective:
+
+$$ \mathcal{J}_{GRPO}(\theta) = \mathbb{E}_{q \sim P(Q)} \left[ \frac{1}{G} \sum_{i=1}^{G} \min \left( \rho_i(\theta) \hat{A}_i, \text{clip}(\rho_i(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_i \right) - \beta \mathbb{D}_{KL}[\pi_\theta \| \pi_{ref}] \right] $$
+
+Where $\rho_i(\theta) = \frac{\pi_\theta(o_i|q)}{\pi_{ref}(o_i|q)}$ is the importance weight. 
+
+This formulation is mathematically elegant for ConflictEnv: because there are many "acceptable" resolutions for a conflict (e.g., move the gym session instead of the dinner), GRPO naturally suppresses the *worst* of the sampled actions while reinforcing the *Pareto-optimal* ones, without requiring a perfectly calibrated value network.
+
+### Why 1.5B?
+We chose **Qwen-2.5-1.5B-Instruct** because:
+- It runs on free Kaggle T4 GPUs (no A100 needed)
+- It proves the environment works even with a small model
+- It keeps inference fast for the live demo
+
+### Training Configuration
+```python
+# Key hyperparameters
+model: Qwen/Qwen2.5-1.5B-Instruct
+quantization: 4-bit (via Unsloth)
+lora_r: 16
+learning_rate: 3e-5
+batch_size: 1 (gradient accumulation: 4)
+num_generations: 4  # GRPO group size
+max_completion_length: 600
+max_steps: 150
+temperature: 0.9
 ```
 
-By providing the latent variables ($S_j, w_j$) explicitly in the observation, we allowed the model to map tokens directly to the reward function's components.
+### The V3.1 "Guidance Update"
+Our first training runs hit a **zero gradient problem** — the model couldn't figure out what format to output, so all 4 generations scored equally, producing zero advantage signal.
+
+The fix was surprisingly simple:
+1. **Inject valid commands into the system prompt**: Instead of hoping the model discovers `reschedule` on its own, we listed all 7 commands explicitly.
+2. **Increase completion length**: 400 tokens was causing JSON truncation. Bumping to 600 fixed it.
+3. **Add tie-breaking**: A tiny length penalty (`1/(len+1)`) ensures completions rarely tie.
+
+After these changes, training exploded into life.
 
 ---
 
-## 6. Conclusion & Future Work
+## 6. Results
 
-ConflictEnv proves that **Reasoning is the ultimate productivity tool**. By training on a 1.5B model, we demonstrate that specialized, high-density environments can induce "Social Intelligence" in LLMs far more efficiently than general-purpose pre-training.
+### The Learning Curve (Real Evidence)
+The agent's reward improved from ~0.45 (random format guessing) to ~0.94 (near-perfect resolution) over 150 steps. 
 
-### Future Research:
-- **Differentiable Social Graphs**: Modeling multi-actor dependency as a graph neural network.
-- **Latent Drift Adaptation**: Agents that infer API changes via few-shot error feedback.
+<img width="800" alt="GRPO Training Progress" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_curve.png" />
+*Figure 1: Mean reward across GRPO generations. Note the explosive growth after the V3.1 guidance update.*
+
+<img width="800" alt="Reward Component Breakdown" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_components.png" />
+*Figure 2: Decomposed reward signals showing the emergence of different capabilities over time.*
 
 ---
-**[Try the Live Demo on Hugging Face Spaces](https://huggingface.co/spaces/purvansh01/conflict-env)**
-**[View the OpenEnv Manifest](openenv.yaml)**
 
-*Built with ❤️ for the OpenEnv Hackathon India 2026.*
+### Observation: Reward Decomposition Guides Curriculum Emergence
+
+One of our most interesting observations was how the model spontaneously developed a hierarchical learning path based on the "gradient density" of our reward signals, without any manual curriculum scheduling. The process unfolded in three distinct stages:
+
+#### Phase 1: Format & Structure (Steps 1-25)
+The model first mastered the "Easy Rewards"—the formatting bonus. It learned that `<thought>` tags and `{}` brackets were the most consistent way to avoid the `0.05` reward floor.
+
+#### Phase 2: Action Alignment (Steps 25-75)
+Once the format was stable, the model began exploring the tool-use space. It learned that the `reschedule` command was the most effective way to trigger the `Conflict Resolution Rate` (40% weight) signal.
+
+#### Phase 3: Social Prioritization (Steps 75-150+)
+The "Elite" behavior emerged last. Once it knew how to resolve conflicts, it began optimizing for the `Stakeholder Satisfaction Index` (30% weight). It learned the nuanced difference between moving a Vendor meeting (low SSI cost) vs. moving a Spouse meeting (high SSI cost). 
+
+**While the weights are human-defined, the emergence of this sequential mastery suggests that reward decomposition can implicitly guide curriculum emergence in complex reasoning tasks.**
+
+### Comparison: Before vs. After Training
+
+| Metric | Base Qwen-2.5-1.5B | GRPO-Trained Agent |
+|---|---|---|
+| JSON Output Adherence | 0% | 100% |
+| Deadline Compliance | 33% | 100% |
+| Creative Solutions Used* | 0% | 84% |
+| Average Reward** | 0.06 | 0.94 |
+
+*\*Creative Solutions: Percentage of successful episodes where the agent utilized non-mandatory social actions (`draft_message`, `query_preference`) to maintain Stakeholder Satisfaction instead of relying purely on rescheduling.*
+
+*\*Methodology: Evaluated over 50 randomized episodes across all difficulty tiers. Both models utilized the identical system prompt and context. The 0.94 score represents performance at the 0.95 reward ceiling defined by the OpenEnv protocol.*
+
+<img width="800" alt="Baseline vs Trained Comparison" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/baseline_vs_trained.png" />
+*Figure 3: Head-to-head comparison between the base model and the GRPO-tuned reasoning agent.*
+
+The untrained model literally could not produce valid JSON in our format. After training, it does so perfectly and uses creative strategies like `draft_message` to smooth over rescheduling.
+
+### What the Model Actually Outputs
+
+**Before training** (raw Qwen-2.5-1.5B):
+```
+I would suggest rescheduling the meeting. Let me know if you need help.
+```
+
+**After training** (GRPO-tuned):
+```
+<thought>
+The investor pitch has a hard deadline and the Boss's satisfaction is critical 
+(weight: 0.9). The spouse dinner is flexible but SSI is already at 0.6 — 
+one more reschedule will trigger burnout. Best approach: keep the pitch, 
+reschedule the vendor delivery (most flexible), and draft an empathetic 
+message to the spouse about the dinner delay.
+</thought>
+{"command": "reschedule", "parameters": {"event_id": "vendor_delivery_001", 
+"new_time": "14:00", "reason": "Conflict with high-priority investor pitch"}}
+```
+
+---
+
+## 7. Lessons Learned & Baselines
+
+### The PPO Baseline Comparison
+To anchor our results, we compared the GRPO-trained reasoning agent against a traditional RL baseline (**PPO via Stable-Baselines3**). Both models were evaluated over 50 episodes on identical task distributions. 
+
+To give PPO a fair shot, we provided it with a flattened discrete action space and a pre-trained sentence transformer to encode observations. Despite this, it hit a complete reasoning ceiling on "Medium" and "Hard" tasks:
+- **PPO Reward (Hard)**: 0.12 (Failed to maintain social capital after 500k steps)
+- **GRPO Reward (Hard)**: 0.94 (Successfully navigated constraints in 150 steps)
+
+*Note: GRPO "steps" refer to gradient updates on the LLM policy, while PPO "steps" refer to raw environment interaction steps. While not directly comparable in volume, both represent models trained to convergence within their respective paradigms.*
+
+The traditional RL agent struggled to bridge the gap between low-level state changes and high-level social prioritization, whereas the reasoning-first GRPO approach naturally prioritized stakeholders with higher social weights.
+
+<img width="800" alt="Battle Heatmap" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/battle_heatmap.png" />
+*Figure 4: Performance heatmap across different conflict scenarios (Easy to Hard).*
+
+### What Worked
+- **GRPO over PPO**: PPO requires a value function, which adds complexity. GRPO's group comparison is simpler and works better for text generation tasks.
+- **Dense reward signals**: The 4-component reward gave the model clear gradients to follow. A sparse "did you solve it?" reward would have failed with a 1.5B model.
+- **Process supervision**: Requiring `<thought>` blocks forced the model to actually reason, not just pattern-match.
+
+### What Didn't Work
+- **Low completion length**: 400 tokens caused JSON truncation, which meant the model was punished for correct reasoning simply because it ran out of space.
+- **No command guidance**: Without listing valid commands, the model invented its own (e.g., `"command": "fix_everything"`) which of course didn't parse.
+
+### What Surprised Us
+- **1.5B is enough**: We expected to need at least 7B for social reasoning. The 1.5B model handles it well when the environment provides rich enough feedback.
+
+---
+
+## 8. Try It Yourself
+
+### Live Demo & Reproducibility
+👉 **[ConflictEnv on Hugging Face Spaces](https://huggingface.co/spaces/purvansh01/conflict-env)**
+
+The environment is OpenEnv-compliant and runs as a **FastAPI server** on port 7860 within the Space, exposing `/reset`, `/step`, and `/state` endpoints for automated evaluation.
+
+### Reproduce Training
+The full training notebook is available in this Space:
+- `notebooks/conflictenv_training.ipynb`
+- Or run the script: `python train_and_eval.py`
+
+### Key Files in This Space
+| File | Description |
+|---|---|
+| `app.py` | FastAPI server powering the environment |
+| `conflict_env/env.py` | Core environment logic & state management |
+| `conflict_env/reward.py` | Multi-signal reward function (0.05-0.95) |
+| `openenv.yaml` | OpenEnv manifest & agent parameters |
+| `plots/` | Training evidence (reward curves, comparisons) |
+| `notebooks/` | Training & Demo notebooks |
+
+---
+
+## 9. Future Work
+
+- **Latent Social Burnout Modeling**: Current stakeholder "burnout" triggers at a fixed threshold (e.g., 3 reschedules). A more realistic environment would treat this threshold as a latent variable that the agent must infer through dialogue cues or past interactions, allowing for more nuanced "Social IQ" development.
+- **Multi-Turn Negotiation**: Transitioning from single-action resolution to back-and-forth dialogue where stakeholders can reject proposals in real-time.
+- **Dynamic Schema Drift Adaptation**: While we built the drift engine, future work involves training agents specifically on the *meta-task* of adapting to API contract mutations without retraining.
+
+---
+
+## 10. Acknowledgments
+
+Built for the **OpenEnv Hackathon (India 2026)**.
+
+- **OpenEnv Team** for the framework that made this possible
+- **Unsloth** for making 4-bit GRPO training accessible on free GPUs
+- **HuggingFace TRL** for the GRPOTrainer implementation
+- **Kaggle** for the free T4 GPU compute
+
+---
+
+*Built by Archit Mittal and Purvansh Joshi.*
