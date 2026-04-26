@@ -157,7 +157,7 @@ Reviewers, please note: *The model genuinely learned to reason.*
 - [x] **Working Training Script**: [Colab Training Notebook (Judges: Run Here)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/notebooks/conflictenv_training.ipynb)
 - [x] **Real Training Evidence**: Loss and reward plots embedded above.
 - [x] **HF Space Environment**: [Live on Hugging Face Spaces](https://huggingface.co/spaces/purvansh01/conflict-env)
-- [x] **Pitch/Writeup**: See our [Technical Blog Post](blog.md) and [Project Report](docs/ConflictEnv_Project_Report.html)
+- [x] **Pitch/Writeup**: See our [Technical Blog Post](Blog.md) and [Project Report](docs/ConflictEnv_Project_Report.html)
 
 
 ### 1. Run the Environment Locally
@@ -177,11 +177,11 @@ python scripts/train_and_eval.py
 ```
 
 ## 🔗 Additional Resources
-*   **[Technical Blog Post (Hackathon Writeup)](blog.md)**
+*   **[Technical Blog Post (Hackathon Writeup)](Blog.md)**
 *   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
 *   **[Colab Training Notebook (Judges: Run Here)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/notebooks/conflictenv_training.ipynb)**
 *   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
-*   **[Main Training Notebook (Local/Kaggle)](notebooks/metaxbanglore.ipynb)**
+*   **[Main Training Notebook (Local/Kaggle)](notebooks/conflictenv_training.ipynb)**
 *   **[Kaggle Training Script](scripts/kaggle_training_script.py)**
 *   **[GRPO Template (TRL)](scripts/grpo_training_template.py)**
 
