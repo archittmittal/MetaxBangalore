@@ -93,19 +93,27 @@ To ensure the agent genuinely understands the *world* rather than just memorizin
 ##  Themes Covered (The "Wild Card" Play)
 ConflictEnv is the first benchmark to **naturally unify all five hackathon themes** into a single, coherent human scenario:
 
-1.  **Multi-Agent Interactions**: Managing 7 actors with competing incentives and counter-proposals.
+1.  **Multi-Agent Interactions**: Managing 7 actors with competing incentives and **dynamic LLM-powered personalities**.
 2.  **Long-Horizon Planning**: Resolving 5-day cascades with sparse end-of-episode rewards.
 3.  **World Modeling (Prof/Pers)**: Interacting with drifting tool APIs while managing personal life trade-offs.
 4.  **Self-Improvement**: An **Adaptive Curriculum** that increases difficulty (more actors, deeper cascades) as the agent's resolution rate improves.
-5.  **Wild Card**: Using "Calendar Chaos" as a meta-narrative to demonstrate that general reasoning is the ultimate solution to personal productivity.
+5.  **Wild Card**: A **Continuous Learning Data Flywheel** that harvests every interaction into a structured RL dataset for offline fine-tuning (GRPO/PPO).
 
 ##  Environment Innovation (What Makes It Hard)
 We deliberately pushed the boundaries of the OpenEnv framework to create a dynamic, game-theoretic environment that cannot be solved by simple regex or prompt engineering.
 
-### 1. Dynamic Counter-Proposals (Theory of Mind)
-Actors in our environment aren't passive. They have `flexibility` scores and `preferred_times`. If an agent reschedules them poorly, the environment autonomously generates a `[COUNTER-PROPOSAL]` and applies a reward penalty, simulating real-world negotiation resistance.
+### 1. Dynamic LLM Stakeholders (Llama-3.2-1B)
+Actors in our environment aren't passive scripts. They are powered by **Llama-3.2-1B-Instruct**, enabling:
+*   **Contextual Negotiation**: Stakeholders generate dynamic, in-character rejections or counter-proposals based on their satisfaction level.
+*   **Personality-Driven Feedback**: Move a board call to 3 AM, and the Boss will be "annoyed" or "passive-aggressive" in their feedback.
+*   **Positive Reinforcement**: Good moves trigger appreciative acceptance messages, rewarding the agent with socially intelligent feedback.
 
-### 2. Anti-Reward Hacking
+### 2. Continuous Learning "Data Flywheel"
+ConflictEnv is the first environment designed to **train itself**. 
+*   **Experience Harvesting**: Every interaction (state, action, reward, LLM feedback) is saved into a high-performance **JSONL Experience Buffer**.
+*   **RL-Ready Dataset**: This buffer builds a massive, structured dataset in real-time that can be pulled to fine-tune agents using GRPO or PPO, creating a closed-loop self-improvement system.
+
+### 3. Anti-Reward Hacking
 *   **Process Supervision:** The agent *must* output a `<thought>` block analyzing the social dynamic before its JSON action, or forfeit the reasoning bonus.
 *   **Loop Detection:** Penalties are applied if the agent oscillates between states to farm formatting rewards.
 
