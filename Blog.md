@@ -35,6 +35,8 @@ ConflictEnv is an **OpenEnv-compliant** reinforcement learning environment that 
 
 ### The Setup
 - **7 Stakeholder Types**: Boss, Spouse, Client, Doctor, School, Vendor, Airline — each with different flexibility levels, preferred times, and social weights.
+- **Dynamic LLM Stakeholders**: Powered by **Llama-3.2-1B**, actors now engage in personality-driven negotiation, providing realistic rejections or acceptances based on their mood.
+- **Continuous Learning Flywheel**: Every interaction is harvested into a structured **JSONL Experience Buffer**, creating a self-improving data loop for agent fine-tuning.
 - **3 Difficulty Tiers**: Easy (single overlap), Medium (cascading conflicts), Hard (multi-day chaos with hard deadlines).
 - **7 Agent Commands**: `reschedule`, `cancel`, `draft_message`, `query_preference`, `escalate`, `confirm`, `resolve`.
 
@@ -43,11 +45,11 @@ ConflictEnv is an **OpenEnv-compliant** reinforcement learning environment that 
 **1. Cascading Conflicts**  
 When you reschedule Event A, it might now overlap with Event B, which pushes against Event C's hard deadline. The agent must think multiple steps ahead.
 
-**2. Dynamic Counter-Proposals**  
-Stakeholders aren't passive. If the agent reschedules a meeting to a bad time, the environment generates a counter-proposal: *"I can't do 3 PM, but 4 PM works."* The agent must adapt.
+**2. Autonomous LLM Stakeholders (Llama-3.2 Integration)**  
+Stakeholders aren't passive scripts anymore. We integrated **Llama-3.2-1B-Instruct** to power their responses. If the agent reschedules a meeting poorly, the environment generates a contextual, in-character rejection: *"I appreciate the offer, but 3 AM is impossible for a board call. How about 9 AM?"* This adds a layer of "Social IQ" that agents must navigate.
 
-**3. Social Burnout**  
-Every stakeholder has a satisfaction score. Push someone too hard (reschedule their events three times), and they "burn out" — refusing all further negotiations. The agent learns that being aggressive is counterproductive.
+**3. The "Data Flywheel" (Continuous Learning)**  
+We implemented an **Experience Harvesting System**. Every turn in the environment is recorded into a high-performance JSONL buffer. This means the environment is **constantly training its successor** by collecting high-quality trajectories that can be used for offline RL (GRPO/PPO).
 
 **4. Anti-Gaming Measures**  
 - The agent *must* output a `<thought>` reasoning block before its JSON action, or it gets zero reasoning bonus.
