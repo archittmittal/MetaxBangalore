@@ -137,7 +137,7 @@ python scripts/train_and_eval.py
 ## 🔗 Additional Resources
 *   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
 *   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
-*   **[Training Notebook (Colab)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/ConflictEnv_GRPO_V3.ipynb)**
+*   **[Training Notebook (Colab)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/notebooks/conflictenv_training.ipynb)**
 *   **[Training Script (Kaggle/Python)](scripts/kaggle_training_script.py)**
 *   **[GRPO Template (TRL)](scripts/grpo_training_template.py)**
 
