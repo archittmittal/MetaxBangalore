@@ -28,7 +28,7 @@ DRIFT_V2 = "v2"
 DRIFT_V3 = "v3"
 
 
-def get_drift_version(episode_number: int, drift_interval: int = 50) -> str:
+def get_drift_version(episode_number: int, drift_interval: int = 1) -> str:
     """
     Deterministic drift schedule.
 
