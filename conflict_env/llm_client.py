@@ -42,8 +42,7 @@ Write a very short (1-2 sentences), in-character message rejecting the proposed 
         response = client.chat_completion(
             messages=[{"role": "user", "content": prompt}],
             max_tokens=50,
-            temperature=0.7,
-            timeout=3.0 # strict timeout so we don't block the environment step
+            temperature=0.7
         )
         msg = response.choices[0].message.content.strip()
         # Clean up quotes if the model wrapped the response in them
