@@ -64,25 +64,25 @@ graph LR
 Reviewers, please note: *The model genuinely learned to reason.*
 
 #### 1. GRPO Reward Curve
-<img width="2247" height="1281" alt="image" src="https://github.com/user-attachments/assets/80d7a7c7-5f80-40fd-92c1-6749861ad9ed" />
+<img width="800" alt="Reward Curve" src="./plots/reward_curve.png" />
 *Figure 1: Agent reward improves from ~5.0 (random format guessing) to ~29.7 (near-perfect) over 200 GRPO steps. The x-axis represents the training step, and the y-axis shows the total reward.*
 
 #### 2. Policy Loss Convergence
-<img width="2116" height="1281" alt="image" src="https://github.com/user-attachments/assets/7f6b48db-b22d-42ba-a59d-818689e456c9" />
+<img width="800" alt="Loss Curve" src="./plots/loss_curve.png" />
 
 *Figure 2: Policy loss drops from ~2.5 to ~0.28, indicating stable convergence. Cosine LR schedule (5e-6) with 4-step gradient accumulation. The x-axis represents the training step, and the y-axis shows the policy loss.*
 
 #### 3. Baseline vs. Trained Agent
-<img width="2100" height="1371" alt="image" src="https://github.com/user-attachments/assets/3ab20d98-0137-4a52-b249-c9e387da5105" />
+<img width="800" alt="Baseline vs Trained" src="./plots/baseline_vs_trained.png" />
 
 *Figure 3: After 200 GRPO steps, the trained agent achieves 100% JSON adherence, zero deadline violations, and 84% creative solution usage.*
 
 #### 4. Reward Component Breakdown
-<img width="2237" height="1281" alt="image" src="https://github.com/user-attachments/assets/3ad9fc05-ed38-46f0-9b42-98b496567a32" />
+<img width="800" alt="Reward Components" src="./plots/reward_components.png" />
 *Figure 4: Decomposed reward shows a natural curriculum: the agent learns formatting first (fast signal), then JSON structure, then domain reasoning.*
 
 #### 5. Head-to-Head Battle: RL vs LLM
-<img width="2556" height="1292" alt="image" src="https://github.com/user-attachments/assets/ed88d5ce-629e-4199-b0d5-f4a84bcafa55" />
+<img width="800" alt="Battle Heatmap" src="./plots/battle_heatmap.png" />
 *Figure 5: The GRPO-trained reasoning agent dominates across all scenarios. The traditional RL agent (PPO) hits a reasoning ceiling on Medium/Hard difficulties.*
 
 ## Quickstart & Reproducibility
@@ -113,8 +113,9 @@ python scripts/train_and_eval.py
 ## 🔗 Additional Resources
 *   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
 *   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
-*   **[Training Script (Kaggle/Colab)](scripts/kaggle_training_script.py)**
+*   **[Training Notebook (Jupyter/Colab)](ConflictEnv_GRPO_V3.ipynb)** [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/ConflictEnv_GRPO_V3.ipynb)
+*   **[Training Script (Kaggle/Python)](scripts/kaggle_training_script.py)**
 *   **[GRPO Template (TRL)](scripts/grpo_training_template.py)**
 
 ---
-*Built with ❤️ for the OpenEnv Hackathon (India 2026).*
+*Built with ❤️ for the OpenEnv Hackathon (India 2026) by Archit Mittal and Purvansh Joshi.*
