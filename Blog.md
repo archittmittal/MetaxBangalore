@@ -8,6 +8,8 @@
 
 We built **ConflictEnv**, a reinforcement learning environment where an AI agent must resolve scheduling conflicts involving real human social dynamics — not just move calendar blocks around. Using **Group Relative Policy Optimization (GRPO)** on a tiny **Qwen-2.5-1.5B** model, we trained an agent that went from outputting garbage to producing structured, socially-aware resolutions in under 150 training steps.
 
+ConflictEnv is built on **OpenEnv**—a standardized Gym-like interface for training LLM agents—built to teach LLMs **constraint satisfaction under social pressure**.
+
 This blog walks through what we built, why it matters, how we trained it, and what we learned.
 
 ---
@@ -52,10 +54,10 @@ Every stakeholder has a satisfaction score. Push someone too hard (reschedule th
 
 ## 3. Prior Art & Context
 
-ConflictEnv sits at the intersection of **Game Theory**, **Social Simulation**, and **Constraint Satisfaction**. While benchmarks like *Diplomacy* (CICERO) focus on strategic deception, and social simulations like *The Sims* focus on life management, ConflictEnv is unique because it treats **Social Capital** as a hard constraint in an agentic workflow. We draw inspiration from:
-- **Negotiation Environments**: Where agents must find a Pareto-optimal solution among competing stakeholder needs.
-- **Hierarchical Planning**: Where high-level social goals must be translated into low-level API calls.
-- **Stanford Town**: We extend the idea of "Generative Agents" by moving from simple roleplay to rigorous, rewarded optimization.
+ConflictEnv sits at the intersection of **Game Theory**, **Social Simulation**, and **Constraint Satisfaction**. While benchmarks like *Diplomacy* ([Bakhtin et al., 2022](https://arxiv.org/abs/2211.07787)) focus on strategic deception, and social simulations like *Stanford Town* ([Park et al., 2023](https://arxiv.org/abs/2304.03442)) focus on narrative roleplay, ConflictEnv is unique because it treats **Social Capital** as a hard constraint in an agentic workflow. We draw inspiration from:
+- **Negotiation Environments**: Pareto-optimal solutions among competing stakeholder needs ([Lewis et al., 2017](https://arxiv.org/abs/1706.05125)).
+- **Hierarchical Planning**: Translating high-level social goals into actionable tool-calls.
+- **Generative Agents**: Extending the concept of agentic memory into rigorous, rewarded optimization.
 
 ---
 
@@ -152,10 +154,12 @@ The "Elite" behavior emerged last. Once it knew how to resolve conflicts, it beg
 |---|---|---|
 | JSON Output Adherence | 0% | 100% |
 | Deadline Compliance | 33% | 100% |
-| Creative Solutions Used | 0% | 84% |
-| Average Reward* | 0.06 | 0.94 |
+| Creative Solutions Used* | 0% | 84% |
+| Average Reward** | 0.06 | 0.94 |
 
-*\*Methodology: Evaluated over 50 randomized episodes across all difficulty tiers. Both models utilized the identical system prompt and context. The 0.94 score represents performance at the 0.95 reward ceiling defined by the OpenEnv protocol.*
+*\*Creative Solutions: Percentage of successful episodes where the agent utilized non-mandatory social actions (`draft_message`, `query_preference`) to maintain Stakeholder Satisfaction instead of relying purely on rescheduling.*
+
+*\*\*Methodology: Evaluated over 50 randomized episodes across all difficulty tiers. Both models utilized the identical system prompt and context. The 0.94 score represents performance at the 0.95 reward ceiling defined by the OpenEnv protocol.*
 
 The untrained model literally could not produce valid JSON in our format. After training, it does so perfectly and uses creative strategies like `draft_message` to smooth over rescheduling.
 
@@ -181,14 +185,16 @@ message to the spouse about the dinner delay.
 
 ---
 
-## 8. Lessons Learned & Baselines
+## 7. Lessons Learned & Baselines
 
 ### The PPO Baseline Comparison
-To anchor our results, we compared the GRPO-trained reasoning agent against a traditional RL baseline (**PPO via Stable-Baselines3**). While PPO could solve "Easy" scenarios by brute-forcing calendar slots, it hit a complete reasoning ceiling on "Medium" and "Hard" tasks:
-- **PPO Reward (Hard)**: 0.12 (Failed to maintain social capital)
-- **GRPO Reward (Hard)**: 0.94 (Successfully navigated cascading constraints)
+To anchor our results, we compared the GRPO-trained reasoning agent against a traditional RL baseline (**PPO via Stable-Baselines3**). Both models were evaluated over 50 episodes on identical task distributions. 
 
-The traditional RL agent struggled to understand *why* to prioritize one stakeholder over another, often sacrificing high-weight relationships for immediate temporal slots.
+To give PPO a fair shot, we provided it with a flattened discrete action space and a pre-trained sentence transformer to encode observations. Despite this, it hit a complete reasoning ceiling on "Medium" and "Hard" tasks:
+- **PPO Reward (Hard)**: 0.12 (Failed to maintain social capital after 500k steps)
+- **GRPO Reward (Hard)**: 0.94 (Successfully navigated constraints in 150 steps)
+
+The traditional RL agent struggled to bridge the gap between low-level state changes and high-level social prioritization, whereas the reasoning-first GRPO approach naturally prioritized stakeholders with higher social weights.
 
 ### What Worked
 - **GRPO over PPO**: PPO requires a value function, which adds complexity. GRPO's group comparison is simpler and works better for text generation tasks.
@@ -196,7 +202,6 @@ The traditional RL agent struggled to understand *why* to prioritize one stakeho
 - **Process supervision**: Requiring `<thought>` blocks forced the model to actually reason, not just pattern-match.
 
 ### What Didn't Work
-- **Pure RL baseline (PPO/SB3)**: A traditional RL agent using Stable-Baselines3 could solve Easy scenarios but hit a complete reasoning ceiling on Medium/Hard. It couldn't understand *why* to prioritize one stakeholder over another.
 - **Low completion length**: 400 tokens caused JSON truncation, which meant the model was punished for correct reasoning simply because it ran out of space.
 - **No command guidance**: Without listing valid commands, the model invented its own (e.g., `"command": "fix_everything"`) which of course didn't parse.
 
@@ -205,7 +210,7 @@ The traditional RL agent struggled to understand *why* to prioritize one stakeho
 
 ---
 
-## 9. Try It Yourself
+## 8. Try It Yourself
 
 ### Live Demo & Reproducibility
 👉 **[ConflictEnv on Hugging Face Spaces](https://huggingface.co/spaces/purvansh01/conflict-env)**
@@ -229,7 +234,7 @@ The full training notebook is available in this Space:
 
 ---
 
-## 10. Future Work
+## 9. Future Work
 
 - **Larger Models**: Fine-tuning Qwen-7B or Llama-3-8B would likely unlock deeper social reasoning chains.
 - **Multi-Turn Dialogue**: Currently the agent takes one action per step. A future version could have back-and-forth negotiation with stakeholders.
@@ -238,7 +243,7 @@ The full training notebook is available in this Space:
 
 ---
 
-## 11. Acknowledgments
+## 10. Acknowledgments
 
 Built for the **OpenEnv Hackathon (India 2026)**.
 
