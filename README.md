@@ -166,7 +166,7 @@ Reviewers, please note: *The model genuinely learned to reason.*
 - [x] **Working Training Script**: [Colab Training Notebook (Judges: Run Here)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/notebooks/conflictenv_training.ipynb)
 - [x] **Real Training Evidence**: Loss and reward plots embedded above.
 - [x] **HF Space Environment**: [Live on Hugging Face Spaces](https://huggingface.co/spaces/purvansh01/conflict-env)
-- [x] **Pitch/Writeup**: See our [Technical Blog Post](blog.md) and [Project Report](docs/ConflictEnv_Project_Report.html)
+- [x] **Pitch/Writeup**: See our [Technical Blog Post](https://huggingface.co/spaces/purvansh01/conflict-env/discussions/1) and [Project Report](docs/ConflictEnv_Project_Report.html)
 
 
 ### 1. Run the Environment Locally
@@ -186,7 +186,7 @@ python scripts/train_and_eval.py
 ```
 
 ## 🔗 Additional Resources
-*   **[Technical Blog Post (Hackathon Writeup)](blog.md)**
+*   **[Technical Blog Post (Hackathon Writeup)](https://huggingface.co/spaces/purvansh01/conflict-env/discussions/1)**
 *   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
 *   **[Colab Training Notebook (Judges: Run Here)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/notebooks/conflictenv_training.ipynb)**
 *   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
