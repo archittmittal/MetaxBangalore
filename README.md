@@ -1,13 +1,5 @@
----
-title: ConflictEnv
-emoji: 📈
-colorFrom: green
-colorTo: indigo
-sdk: docker
-pinned: false
----
 
-# 🤖 ConflictEnv: The Elite Reasoning Executive Assistant
+#  ConflictEnv: The Elite Reasoning Executive Assistant
 ### *Deep Reinforcement Learning for High-Stakes Scheduling*
 
 **"Because scheduling is easy, but human life is complex."**
@@ -15,7 +7,7 @@ pinned: false
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-blue)](https://huggingface.co/spaces/purvansh01/conflict-env)
 [![OpenEnv Compliant](https://img.shields.io/badge/OpenEnv-Compliant-green)](https://github.com/OpenEnv/OpenEnv)
 
-## 🚨 The Problem Statement
+##  The Problem Statement
 Existing AI agents can parse calendars, but they fail at **social judgment** and **dynamic adaptation**. 
 - **The Efficiency Gap**: Every knowledge worker loses 2–4 hours per week to scheduling conflicts—totaling ~150 billion hours annually.
 - **The Social Gap**: Moving an *investor pitch* is catastrophic, while moving a *1:1 with an intern* is acceptable but requires empathy. Current models lack a "Social IQ" for these trade-offs.
@@ -39,7 +31,7 @@ graph TD
     H --> I[Updated Calendar State]
 ```
 
-## 🚀 Our Approach: ConflictEnv (OpenEnv Native)
+##  Our Approach: ConflictEnv (OpenEnv Native)
 We built **ConflictEnv**, a high-fidelity RL environment strictly following the **OpenEnv protocol**, to train agents that don't just "solve" calendars, but **negotiate life**.
 
 ### 1. Cascading Conflict Engine
@@ -57,7 +49,7 @@ To ensure the agent genuinely understands the *world* rather than just memorizin
 - **V2 (Renames)**: `start_time` becomes `startTime`.
 - **V3 (Structural)**: Flat structures become nested objects.
 
-## 🎭 Themes Covered (The "Wild Card" Play)
+##  Themes Covered (The "Wild Card" Play)
 ConflictEnv is the first benchmark to **naturally unify all five hackathon themes** into a single, coherent human scenario:
 
 1.  **Multi-Agent Interactions**: Managing 7 actors with competing incentives and counter-proposals.
@@ -66,7 +58,7 @@ ConflictEnv is the first benchmark to **naturally unify all five hackathon theme
 4.  **Self-Improvement**: An **Adaptive Curriculum** that increases difficulty (more actors, deeper cascades) as the agent's resolution rate improves.
 5.  **Wild Card**: Using "Calendar Chaos" as a meta-narrative to demonstrate that general reasoning is the ultimate solution to personal productivity.
 
-## 🌪️ Environment Innovation (What Makes It Hard)
+##  Environment Innovation (What Makes It Hard)
 We deliberately pushed the boundaries of the OpenEnv framework to create a dynamic, game-theoretic environment that cannot be solved by simple regex or prompt engineering.
 
 ### 1. Dynamic Counter-Proposals (Theory of Mind)
@@ -76,7 +68,7 @@ Actors in our environment aren't passive. They have `flexibility` scores and `pr
 *   **Process Supervision:** The agent *must* output a `<thought>` block analyzing the social dynamic before its JSON action, or forfeit the reasoning bonus.
 *   **Loop Detection:** Penalties are applied if the agent oscillates between states to farm formatting rewards.
 
-## 📊 Training Pipeline & Results (Proof It Works)
+##  Training Pipeline & Results (Proof It Works)
 We trained a **Qwen-2.5-1.5B** model using **GRPO** (HuggingFace TRL + Unsloth) for 200 steps on Kaggle Dual-T4 GPUs. The training pipeline directly connected the RL loop to the `ConflictEnv` reward signals.
 
 ### Reward Engineering
@@ -117,7 +109,7 @@ Reviewers, please note: *The model genuinely learned to reason.*
 <img width="800" alt="Battle Heatmap" src="./plots/battle_heatmap.png" />
 *Figure 5: The GRPO-trained reasoning agent dominates across all scenarios.*
 
-## 💻 Quickstart & Reproducibility
+##  Quickstart & Reproducibility
 
 ### Minimum Submission Requirements Checklist:
 - [x] **OpenEnv Framework Used**: Built strictly on top of the framework.
@@ -146,6 +138,7 @@ python scripts/train_and_eval.py
 *   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
 *   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
 *   **[Main Training Notebook (MetaxBangalore)](notebooks/metaxbanglore.ipynb)**
+*   **[Alternative Training Notebook (Colab)](notebooks/conflictenv_training.ipynb)**
 *   **[Kaggle Training Script](scripts/kaggle_training_script.py)**
 *   **[GRPO Template (TRL)](scripts/grpo_training_template.py)**
 
