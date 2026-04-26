@@ -23,6 +23,7 @@ from .actors import (
     apply_satisfaction_delta,
     compute_satisfaction_delta,
     generate_counter_proposal,
+    generate_acceptance_message,
 )
 from .drift import apply_drift, get_drift_version
 from .scenarios import generate_scenario, Scenario, ARCHETYPES, ALL_SLOTS
@@ -392,8 +393,19 @@ class ConflictEnv(Environment):
         )
         self._accumulate_reward(step_delta)
 
+        # Generate an acceptance message from one of the actors
+        acceptance_msg = ""
+        for actor_id in event.get("actor_ids", []):
+            actor = self._actors.get(actor_id)
+            if actor:
+                acceptance_msg = generate_acceptance_message(actor, new_slot)
+                if acceptance_msg:
+                    logger.info(f"[ConflictEnv] LLM Response: {acceptance_msg}")
+                    break
+
         self._last_feedback = (
             f"[OK] '{event.get('title', event_id)}' rescheduled to {new_slot}."
+            + (f" {acceptance_msg}" if acceptance_msg else "")
             + (f" [RESOLVED] Conflict resolved!" if conflict_resolved else "")
             + (f" [DEADLINE] Deadline secured!" if deadline_met else "")
         )

@@ -286,6 +286,29 @@ def generate_counter_proposal(
     }
 
 
+def generate_acceptance_message(
+    actor: Actor,
+    proposed_slot: str,
+) -> str:
+    """Generate a dynamic, in-character acceptance message."""
+    # API-governed actors don't talk
+    if actor.flexibility == Flexibility.API:
+        return ""
+
+    dynamic_message = generate_actor_message(
+        actor_name=actor.name,
+        actor_role=actor.role,
+        tone_sensitivity=actor.tone_sensitivity.name.lower(),
+        satisfaction=actor.satisfaction,
+        proposed_slot=proposed_slot,
+        alternatives=[] # Signals acceptance
+    )
+    
+    if dynamic_message:
+        return f"{actor.emoji} {dynamic_message}"
+    return ""
+
+
 # ---------------------------------------------------------------------------
 #  Internal helpers
 # ---------------------------------------------------------------------------

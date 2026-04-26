@@ -24,25 +24,29 @@ except Exception as e:
 
 def generate_actor_message(actor_name: str, actor_role: str, tone_sensitivity: str, satisfaction: float, proposed_slot: str, alternatives: list) -> str:
     """
-    Generate a dynamic, in-character response from an actor rejecting a time slot.
-    Returns None if the API fails, allowing a fallback to the hardcoded string.
+    Generate a dynamic, in-character response from an actor.
+    If alternatives is empty, it's an acceptance message.
     """
     if not client:
         return None
 
     # Determine emotional state based on satisfaction
     if satisfaction > 0.8:
-        mood = "polite but firm"
+        mood = "very happy and cooperative" if not alternatives else "polite but firm"
     elif satisfaction > 0.4:
-        mood = "annoyed"
+        mood = "neutral" if not alternatives else "annoyed"
     else:
-        mood = "very frustrated and passive-aggressive"
+        mood = "exhausted" if not alternatives else "very frustrated and passive-aggressive"
 
-    alt_str = " or ".join(alternatives)
-    prompt = f"""You are {actor_name}, a {actor_role}. Your tone sensitivity is {tone_sensitivity}. Your current mood is {mood}.
-The scheduling assistant just proposed a meeting at {proposed_slot}, but you cannot make it.
-You MUST suggest {alt_str} instead.
-Write a very short (1-2 sentences), in-character message rejecting the proposed time and suggesting the alternatives. Do not use hashtags or emojis. Keep it realistic."""
+    if alternatives:
+        alt_str = " or ".join(alternatives)
+        prompt = f"""You are {actor_name}, a {actor_role}. Mood: {mood}. Sensitivity: {tone_sensitivity}.
+You reject a meeting at {proposed_slot} and MUST suggest {alt_str} instead.
+Write a 1-sentence in-character rejection. No emojis."""
+    else:
+        prompt = f"""You are {actor_name}, a {actor_role}. Mood: {mood}. Sensitivity: {tone_sensitivity}.
+You ACCEPT a meeting at {proposed_slot}. 
+Write a 1-sentence in-character acceptance message. No emojis."""
 
     try:
         response = client.chat_completion(
