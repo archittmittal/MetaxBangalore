@@ -1,5 +1,13 @@
+---
+title: ConflictEnv
+emoji: 📈
+colorFrom: green
+colorTo: indigo
+sdk: docker
+pinned: false
+---
 
-#  ConflictEnv: The Elite Reasoning Executive Assistant
+# 🤖 ConflictEnv: The Elite Reasoning Executive Assistant
 ### *Deep Reinforcement Learning for High-Stakes Scheduling*
 
 **"Because scheduling is easy, but human life is complex."**
