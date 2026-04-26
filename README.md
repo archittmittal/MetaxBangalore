@@ -121,10 +121,10 @@ Reviewers, please note: *The model genuinely learned to reason.*
 
 ### Minimum Submission Requirements Checklist:
 - [x] **OpenEnv Framework Used**: Built strictly on top of the framework.
-- [x] **Working Training Script**: See `kaggle_training_script.py` and `grpo_training_template.py`
+- [x] **Working Training Script**: See [scripts/kaggle_training_script.py](scripts/kaggle_training_script.py) and [scripts/grpo_training_template.py](scripts/grpo_training_template.py)
 - [x] **Real Training Evidence**: Loss and reward plots embedded above.
 - [x] **HF Space Environment**: [Live on Hugging Face Spaces](https://huggingface.co/spaces/purvansh01/conflict-env)
-- [x] **Pitch/Writeup**: See `docs/ConflictEnv_Project_Report.html`
+- [x] **Pitch/Writeup**: See [docs/ConflictEnv_Project_Report.html](docs/ConflictEnv_Project_Report.html)
 
 ### 1. Run the Environment Locally
 ```bash
@@ -145,8 +145,8 @@ python scripts/train_and_eval.py
 ## 🔗 Additional Resources
 *   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
 *   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
-*   **[Training Notebook (Colab)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/ConflictEnv_GRPO_V3.ipynb)**
-*   **[Training Script (Kaggle/Python)](scripts/kaggle_training_script.py)**
+*   **[Main Training Notebook (MetaxBangalore)](notebooks/metaxbanglore.ipynb)**
+*   **[Kaggle Training Script](scripts/kaggle_training_script.py)**
 *   **[GRPO Template (TRL)](scripts/grpo_training_template.py)**
 
 ---
