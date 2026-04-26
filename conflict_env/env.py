@@ -103,7 +103,9 @@ class ConflictEnv(Environment):
           - "easy", "medium", "hard" -- Fixed difficulty
           - "morning_crunch", etc. -- specific archetype
         """
+        from .utils import get_buffer_size
         logger.info(f"\n[ConflictEnv] Resetting -- task: {task_name}, episode: {self._episode_count}")
+        logger.info(f"[ConflictEnv] Experience Buffer: {get_buffer_size()} steps collected for learning.")
 
         # --- Theme #4: Adaptive Curriculum ---
         if task_name == "auto":
@@ -271,6 +273,18 @@ class ConflictEnv(Environment):
             )
 
         self._current_obs = self._build_observation()
+
+        # --- Continuous Learning: Log experience for fine-tuning ---
+        from .utils import log_experience
+        log_experience(
+            state=None, # In a real RL loop we'd serialize the full state
+            action=action.model_dump() if hasattr(action, 'model_dump') else str(action),
+            reward=self._last_step_reward,
+            feedback=self._last_feedback,
+            next_state=self._current_obs.model_dump() if hasattr(self._current_obs, 'model_dump') else None,
+            done=self._done
+        )
+
         return self._current_obs
 
     # ===================================================================
