@@ -98,13 +98,15 @@ This optimization is particularly effective for ConflictEnv because it allows th
 
 ---
 
-## 6. Dataset Generation and Trajectories
+### 6. Dataset Generation and Experience Harvesting
+We generate trajectories using a two-stage process:
+1.  **Teacher-Forcing:** 1,200 "Golden Trajectories" were created to bootstrap the model.
+2.  **Continuous Learning Loop:** The environment now implements a **Data Flywheel**. Every interaction (state, action, reward, and LLM feedback) is harvested into a structured **JSONL Experience Buffer**. This enables the model to learn from real-world usage patterns and stakeholder rejections in a self-improving cycle.
 
-We generate a synthetic dataset of **1,200 "Golden Trajectories"** using a teacher-forcing mechanism. Each trajectory consists of:
-1.  **Initial Conflict:** A multi-event overlap.
-2.  **Reasoning Chain:** A `<thought>` block analyzing stakeholder weights.
-3.  **Action Sequence:** A series of tool calls resolving the cascade.
-4.  **Schema Variant:** The specific drift version (V1, V2, or V3) applied to that episode.
+### 6.2 LLM Stakeholder Personality Model
+Unlike static rejection scripts, stakeholders are powered by **meta-llama/Llama-3.2-1B-Instruct**. This provides:
+- **Dynamic Theory of Mind:** Actors respond with contextual rejections or acceptances based on their satisfaction level.
+- **Natural Language Reinforcement:** The agent receives rich social feedback, allowing it to "understand" the human cost of its scheduling decisions.
 
 ---
 

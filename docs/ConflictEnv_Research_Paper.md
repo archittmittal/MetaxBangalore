@@ -79,11 +79,16 @@ $$\text{DSS} = \frac{\mathbb{E}[R \mid \mathcal{M}_{V3}]}{\mathbb{E}[R \mid \mat
 
 ## 5. Environment Design
 
-### 5.1 Actor Negotiation Model
-Unlike static environments, ConflictEnv stakeholders perform **Autonomous Rejection**. Each actor $i$ has a rejection threshold $\tau_i$. If a proposed action $a$ yields $S_i < \tau_i$, the environment returns a `counter_proposal`, forcing the agent to engage in a multi-turn negotiation.
+### 5.1 Autonomous LLM Stakeholders (Llama-3.2 Integration)
+Unlike static environments with robotic counter-proposals, ConflictEnv stakeholders are now powered by **meta-llama/Llama-3.2-1B-Instruct**. This enables:
+- **High-Fidelity Personalities:** Actors generate dynamic, in-character rejections or acceptances based on their real-time satisfaction and mood.
+- **Social Reinforcement:** The environment provides rich, natural-language social signals that an agent can reason over, moving beyond simple numeric rewards.
 
 ### 5.2 Scenario Generation
 Scenarios are generated using a constrained stochastic process that ensures every episode contains at least one "Critical Path" conflict involving $\geq 3$ stakeholders.
+
+### 5.3 Continuous Learning Loop (Data Flywheel)
+To enable self-improvement, ConflictEnv implements an **Experience Harvesting** pipeline. Every interaction (state, action, reward, and LLM stakeholder feedback) is logged into a structured **JSONL Experience Buffer**. This dataset serves as the foundation for offline RL (GRPO/PPO), allowing the model to learn from human or expert-agent trajectories in the environment.
 
 ---
 
