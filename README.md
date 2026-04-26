@@ -135,23 +135,23 @@ graph LR
 Reviewers, please note: *The model genuinely learned to reason.*
 
 #### 1. GRPO Reward Curve
-<img width="800" alt="Reward Curve" src="./plots/reward_curve.png" />
+<img width="800" alt="Reward Curve" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_curve.png" />
 *Figure 1: Agent reward improves from ~5.0 (random format guessing) to ~29.7 (near-perfect) over 200 GRPO steps.*
 
 #### 2. Policy Loss Convergence
-<img width="800" alt="Loss Curve" src="./plots/loss_curve.png" />
+<img width="800" alt="Loss Curve" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/loss_curve.png" />
 *Figure 2: Policy loss drops from ~2.5 to ~0.28, indicating stable convergence.*
 
 #### 3. Baseline vs. Trained Agent
-<img width="800" alt="Baseline vs Trained" src="./plots/baseline_vs_trained.png" />
+<img width="800" alt="Baseline vs Trained" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/baseline_vs_trained.png" />
 *Figure 3: After 200 GRPO steps, the trained agent achieves 100% JSON adherence, zero deadline violations, and 84% creative solution usage.*
 
 #### 4. Reward Component Breakdown
-<img width="800" alt="Reward Components" src="./plots/reward_components.png" />
+<img width="800" alt="Reward Components" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_components.png" />
 *Figure 4: Decomposed reward shows a natural curriculum: the agent learns formatting first, then JSON structure, then domain reasoning.*
 
 #### 5. Head-to-Head Battle: RL vs LLM
-<img width="800" alt="Battle Heatmap" src="./plots/battle_heatmap.png" />
+<img width="800" alt="Battle Heatmap" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/battle_heatmap.png" />
 *Figure 5: The GRPO-trained reasoning agent dominates across all scenarios.*
 
 ##  Quickstart & Reproducibility

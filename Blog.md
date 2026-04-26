@@ -77,6 +77,7 @@ Our reward function (`conflict_env/reward.py`) uses a base weighted sum that def
 | **Stakeholder Satisfaction (SSI)** | 0.30 | Social debt: Did you maintain actor happiness? |
 | **Deadline Adherence** | 0.20 | Physical constraints: Did you respect the flight/demo times? |
 | **Efficiency** | 0.10 | Temporal cost: Did you solve it in the fewest steps? |
+| **Reasoning Bonus (Additive)** | +0.10 | Process Supervision: Was a thought block present? |
 
 ### The "Reasoning Booster" (Process Supervision)
 To ensure the model doesn't just "guess" the right JSON, we added a **+0.10 Reasoning Bonus** if a valid `<thought>` block is present. Conversely, we apply a **-0.20 Loop Penalty** to prevent "reward hacking" (where agents oscillate between two states to farm step-wise formatting rewards). This brings the theoretical maximum reward to 1.10, which is then clamped to the OpenEnv-safe range of `[0.05, 0.95]`.
@@ -125,25 +126,28 @@ After these changes, training exploded into life.
 ### The Learning Curve (Real Evidence)
 The agent's reward improved from ~0.45 (random format guessing) to ~0.94 (near-perfect resolution) over 150 steps. 
 
-<img width="800" alt="GRPO Training Progress" src="./plots/reward_curve.png" />
+<img width="800" alt="GRPO Training Progress" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_curve.png" />
 *Figure 1: Mean reward across GRPO generations. Note the explosive growth after the V3.1 guidance update.*
 
-<img width="800" alt="Reward Component Breakdown" src="./plots/reward_components.png" />
-*Figure 2: Decomposed reward signals showing the emergence of different capabilities over time.*
+<img width="800" alt="Policy Loss Convergence" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/loss_curve.png" />
+*Figure 2: Policy loss convergence indicating stable training.*
+
+<img width="800" alt="Reward Component Breakdown" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_components.png" />
+*Figure 3: Decomposed reward signals showing the emergence of different capabilities over time.*
 
 ---
 
 ### Observation: Reward Decomposition Guides Curriculum Emergence
 
-One of our most interesting observations was how the model spontaneously developed a hierarchical learning path based on the "gradient density" of our reward signals, without any manual curriculum scheduling.
+One of our most interesting observations was how the model spontaneously developed a hierarchical learning path based on the "gradient density" of our reward signals, without any manual curriculum scheduling. The process unfolded in three distinct stages:
 
-### Phase 1: Format & Structure (Steps 1-25)
+#### Phase 1: Format & Structure (Steps 1-25)
 The model first mastered the "Easy Rewards"—the formatting bonus. It learned that `<thought>` tags and `{}` brackets were the most consistent way to avoid the `0.05` reward floor.
 
-### Phase 2: Action Alignment (Steps 25-75)
+#### Phase 2: Action Alignment (Steps 25-75)
 Once the format was stable, the model began exploring the tool-use space. It learned that the `reschedule` command was the most effective way to trigger the `Conflict Resolution Rate` (40% weight) signal.
 
-### Phase 3: Social Prioritization (Steps 75-150+)
+#### Phase 3: Social Prioritization (Steps 75-150+)
 The "Elite" behavior emerged last. Once it knew how to resolve conflicts, it began optimizing for the `Stakeholder Satisfaction Index` (30% weight). It learned the nuanced difference between moving a Vendor meeting (low SSI cost) vs. moving a Spouse meeting (high SSI cost). 
 
 **While the weights are human-defined, the emergence of this sequential mastery suggests that reward decomposition can implicitly guide curriculum emergence in complex reasoning tasks.**
@@ -160,6 +164,9 @@ The "Elite" behavior emerged last. Once it knew how to resolve conflicts, it beg
 *\*Creative Solutions: Percentage of successful episodes where the agent utilized non-mandatory social actions (`draft_message`, `query_preference`) to maintain Stakeholder Satisfaction instead of relying purely on rescheduling.*
 
 *\*\*Methodology: Evaluated over 50 randomized episodes across all difficulty tiers. Both models utilized the identical system prompt and context. The 0.94 score represents performance at the 0.95 reward ceiling defined by the OpenEnv protocol.*
+
+<img width="800" alt="Baseline vs Trained Comparison" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/baseline_vs_trained.png" />
+*Figure 4: Head-to-head comparison between the base model and the GRPO-tuned reasoning agent.*
 
 The untrained model literally could not produce valid JSON in our format. After training, it does so perfectly and uses creative strategies like `draft_message` to smooth over rescheduling.
 
@@ -194,7 +201,12 @@ To give PPO a fair shot, we provided it with a flattened discrete action space a
 - **PPO Reward (Hard)**: 0.12 (Failed to maintain social capital after 500k steps)
 - **GRPO Reward (Hard)**: 0.94 (Successfully navigated constraints in 150 steps)
 
+*Note: GRPO "steps" refer to gradient updates on the LLM policy, while PPO "steps" refer to raw environment interaction steps. While not directly comparable in volume, both represent models trained to convergence within their respective paradigms.*
+
 The traditional RL agent struggled to bridge the gap between low-level state changes and high-level social prioritization, whereas the reasoning-first GRPO approach naturally prioritized stakeholders with higher social weights.
+
+<img width="800" alt="Battle Heatmap" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/battle_heatmap.png" />
+*Figure 5: Performance heatmap across different conflict scenarios (Easy to Hard).*
 
 ### What Worked
 - **GRPO over PPO**: PPO requires a value function, which adds complexity. GRPO's group comparison is simpler and works better for text generation tasks.
@@ -236,10 +248,9 @@ The full training notebook is available in this Space:
 
 ## 9. Future Work
 
-- **Larger Models**: Fine-tuning Qwen-7B or Llama-3-8B would likely unlock deeper social reasoning chains.
-- **Multi-Turn Dialogue**: Currently the agent takes one action per step. A future version could have back-and-forth negotiation with stakeholders.
-- **Real Calendar Integration**: Connecting to Google Calendar or Outlook to handle actual scheduling conflicts.
-- **Schema Drift**: We designed the environment to support "schema drift" — where the JSON format changes mid-episode — but didn't fully train against it in this version.
+- **Latent Social Burnout Modeling**: Current stakeholder "burnout" triggers at a fixed threshold (e.g., 3 reschedules). A more realistic environment would treat this threshold as a latent variable that the agent must infer through dialogue cues or past interactions, allowing for more nuanced "Social IQ" development.
+- **Multi-Turn Negotiation**: Transitioning from single-action resolution to back-and-forth dialogue where stakeholders can reject proposals in real-time.
+- **Dynamic Schema Drift Adaptation**: While we built the drift engine, future work involves training agents specifically on the *meta-task* of adapting to API contract mutations without retraining.
 
 ---
 
