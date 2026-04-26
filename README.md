@@ -14,6 +14,11 @@ pinned: false
 
 [![Hugging Face Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-blue)](https://huggingface.co/spaces/purvansh01/conflict-env)
 [![OpenEnv Compliant](https://img.shields.io/badge/OpenEnv-Compliant-green)](https://github.com/OpenEnv/OpenEnv)
+[![Theme #3.2](https://img.shields.io/badge/Hackathon_Theme-3.2_Personalized_Tasks-purple)](#themes-covered-the-wild-card-play)
+
+> **🎯 Official Hackathon Submission for Theme #3.2 (Personalized Tasks)**  
+> *The prompt for Theme #3.2 specifically asked for: "handling dinner conflicts due to work conflicts... executive assistant meeting planner." ConflictEnv is built exactly to solve this!*
+
 
 ##  The Problem Statement
 Existing AI agents can parse calendars, but they fail at **social judgment** and **dynamic adaptation**. 
@@ -135,33 +140,34 @@ graph LR
 Reviewers, please note: *The model genuinely learned to reason.*
 
 #### 1. GRPO Reward Curve
-<img width="800" alt="Reward Curve" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_curve.png" />
+<img width="800" alt="Reward Curve" src="./plots/reward_curve.png" />
 *Figure 1: Agent reward improves from ~5.0 (random format guessing) to ~29.7 (near-perfect) over 200 GRPO steps.*
 
 #### 2. Policy Loss Convergence
-<img width="800" alt="Loss Curve" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/loss_curve.png" />
+<img width="800" alt="Loss Curve" src="./plots/loss_curve.png" />
 *Figure 2: Policy loss drops from ~2.5 to ~0.28, indicating stable convergence.*
 
 #### 3. Baseline vs. Trained Agent
-<img width="800" alt="Baseline vs Trained" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/baseline_vs_trained.png" />
+<img width="800" alt="Baseline vs Trained" src="./plots/baseline_vs_trained.png" />
 *Figure 3: After 200 GRPO steps, the trained agent achieves 100% JSON adherence, zero deadline violations, and 84% creative solution usage.*
 
 #### 4. Reward Component Breakdown
-<img width="800" alt="Reward Components" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/reward_components.png" />
+<img width="800" alt="Reward Components" src="./plots/reward_components.png" />
 *Figure 4: Decomposed reward shows a natural curriculum: the agent learns formatting first, then JSON structure, then domain reasoning.*
 
 #### 5. Head-to-Head Battle: RL vs LLM
-<img width="800" alt="Battle Heatmap" src="https://huggingface.co/spaces/purvansh01/conflict-env/resolve/main/plots/battle_heatmap.png" />
+<img width="800" alt="Battle Heatmap" src="./plots/battle_heatmap.png" />
 *Figure 5: The GRPO-trained reasoning agent dominates across all scenarios.*
 
 ##  Quickstart & Reproducibility
 
 ### Minimum Submission Requirements Checklist:
 - [x] **OpenEnv Framework Used**: Built strictly on top of the framework.
-- [x] **Working Training Script**: See [scripts/kaggle_training_script.py](scripts/kaggle_training_script.py) and [scripts/grpo_training_template.py](scripts/grpo_training_template.py)
+- [x] **Working Training Script**: [Colab Training Notebook (Judges: Run Here)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/notebooks/conflictenv_training.ipynb)
 - [x] **Real Training Evidence**: Loss and reward plots embedded above.
 - [x] **HF Space Environment**: [Live on Hugging Face Spaces](https://huggingface.co/spaces/purvansh01/conflict-env)
-- [x] **Pitch/Writeup**: See [docs/ConflictEnv_Project_Report.html](docs/ConflictEnv_Project_Report.html)
+- [x] **Pitch/Writeup**: See our [Technical Blog Post](blog.md) and [Project Report](docs/ConflictEnv_Project_Report.html)
+
 
 ### 1. Run the Environment Locally
 ```bash
@@ -180,10 +186,11 @@ python scripts/train_and_eval.py
 ```
 
 ## 🔗 Additional Resources
+*   **[Technical Blog Post (Hackathon Writeup)](blog.md)**
 *   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
+*   **[Colab Training Notebook (Judges: Run Here)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/notebooks/conflictenv_training.ipynb)**
 *   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
-*   **[Main Training Notebook (MetaxBangalore)](notebooks/metaxbanglore.ipynb)**
-*   **[Alternative Training Notebook (Colab)](notebooks/conflictenv_training.ipynb)**
+*   **[Main Training Notebook (Local/Kaggle)](notebooks/metaxbanglore.ipynb)**
 *   **[Kaggle Training Script](scripts/kaggle_training_script.py)**
 *   **[GRPO Template (TRL)](scripts/grpo_training_template.py)**
 

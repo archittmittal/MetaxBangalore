@@ -4,6 +4,9 @@
 
 ---
 
+> **🏆 Official Hackathon Submission**
+> This project directly targets **Theme #3.2: Personalized Tasks** (specifically the prompt: *"handling dinner conflicts due to work conflicts... executive assistant meeting planner"*) and **Theme #5: Wild Card** by introducing real-world schema drift and dynamic social constraints into the OpenEnv framework.
+
 ## TL;DR
 
 We built **ConflictEnv**, a reinforcement learning environment where an AI agent must resolve scheduling conflicts involving real human social dynamics — not just move calendar blocks around. Using **Group Relative Policy Optimization (GRPO)** on a tiny **Qwen-2.5-1.5B** model, we trained an agent that went from outputting garbage to producing structured, socially-aware resolutions in under 150 training steps.
