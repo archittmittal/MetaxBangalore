@@ -1,13 +1,4 @@
----
-title: ConflictEnv
-emoji: 📈
-colorFrom: green
-colorTo: indigo
-sdk: docker
-pinned: false
----
-
-# 🤖 ConflictEnv: The Elite Reasoning Executive Assistant
+#  ConflictEnv: The Elite Reasoning Executive Assistant
 ### *Deep Reinforcement Learning for High-Stakes Scheduling*
 
 **"Because scheduling is easy, but human life is complex."**
@@ -16,7 +7,7 @@ pinned: false
 [![OpenEnv Compliant](https://img.shields.io/badge/OpenEnv-Compliant-green)](https://github.com/OpenEnv/OpenEnv)
 [![Theme #5](https://img.shields.io/badge/Hackathon_Theme-5_Wild_Card-purple)](#themes-covered-the-wild-card-play)
 
-> **🎯 Official Hackathon Submission for Theme #5 (Wild Card)**  
+> ** Official Hackathon Submission for Theme #5 (Wild Card)**  
 > *Why choose one theme when you can tackle them all? ConflictEnv is a Wild Card submission engineered to naturally unify all hackathon themes (Multi-Agent Interactions, Long-Horizon Planning, World Modeling, and Self-Improvement) into a single, cohesive real-world challenge: cascading human scheduling conflicts.*
 
 
@@ -44,7 +35,7 @@ graph TD
     H --> I[Updated Calendar State]
 ```
 
-## 🚀 Our Approach: ConflictEnv (OpenEnv Native)
+##  Our Approach: ConflictEnv (OpenEnv Native)
 We built **ConflictEnv**, a high-fidelity RL environment strictly following the **OpenEnv protocol**, to train agents that don't just "solve" calendars, but **negotiate life**.
 
 ### High-Level Workflow
@@ -190,7 +181,7 @@ python scripts/train_and_eval.py
 *   **[HuggingFace Space (Live Environment)](https://huggingface.co/spaces/purvansh01/conflict-env)**
 *   **[Colab Training Notebook (Judges: Run Here)](https://colab.research.google.com/github/archittmittal/MetaxBangalore/blob/main/notebooks/conflictenv_training.ipynb)**
 *   **[Project Report / Technical Walkthrough](docs/ConflictEnv_Project_Report.html)**
-*   **[Main Training Notebook (Local/Kaggle)](notebooks/metaxbanglore.ipynb)**
+*   **[Main Training Notebook (Local/Kaggle)](notebooks/conflictenv_training.ipynb)**
 *   **[Kaggle Training Script](scripts/kaggle_training_script.py)**
 *   **[GRPO Template (TRL)](scripts/grpo_training_template.py)**
 
