@@ -1,12 +1,3 @@
----
-title: ConflictEnv
-emoji: 📅
-colorFrom: red
-colorTo: indigo
-sdk: docker
-pinned: false
----
-
 #  ConflictEnv: The Elite Reasoning Executive Assistant
 ### *Deep Reinforcement Learning for High-Stakes Scheduling*
 
